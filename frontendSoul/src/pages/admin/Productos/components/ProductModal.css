@@ -1,0 +1,373 @@
+/* src/pages/admin/Productos/components/ProductModal.css */
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.custom-select {
+  background-color: #121212;
+  border: 1px solid #27272a;
+  color: #ffffff;
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+  width: 100%;
+}
+
+.custom-select:focus { border-color: #C9A24D; } 
+
+.stock-section {
+  background-color: #121212;
+  border: 1px solid #27272a;
+  padding: 16px;
+  border-radius: 8px;
+  margin-top: 8px;
+}
+
+.stock-section label {
+  display: block;
+  font-size: 14px;
+  color: #e4e4e7;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+/* Grilla para edición */
+.stock-inputs-grid {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.stock-input-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.stock-input-box span {
+  font-size: 12px;
+  color: #a1a1aa;
+}
+
+.stock-input-box input {
+  width: 50px;
+  background-color: #18181b;
+  border: 1px solid #3f3f46;
+  color: #ffffff;
+  padding: 8px;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.stock-input-box input:focus {
+  border-color: #C9A24D;
+  outline: none;
+}
+
+/* Grilla limpia para vista de detalles */
+.view-stock-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.view-stock-badge {
+  background-color: #18181b;
+  border: 1px solid #3f3f46;
+  padding: 8px 12px;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.talla-label { font-size: 11px; color: #a1a1aa; }
+.talla-value { font-size: 14px; color: #C9A24D; font-weight: 600; }
+
+.stock-total-display {
+  margin-top: 16px;
+  font-size: 14px;
+  color: #a1a1aa;
+}
+
+.stock-highlight {
+  color: #C9A24D;
+  font-weight: 600;
+}
+
+/* Base Inputs y Selects */
+.input-group label {
+  display: block;
+  color: #e4e4e7;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.input-group input, 
+.input-group select {
+  width: 100%;
+  padding: 10px 12px;
+  background-color: #18181b;
+  border: 1px solid #3f3f46;
+  border-radius: 6px;
+  color: #e4e4e7;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+/* Select Personalizado */
+.input-group select {
+  appearance: none; 
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23a1a1aa%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  padding-right: 40px; 
+  cursor: pointer;
+}
+
+.input-group select option { background-color: #18181b; color: #e4e4e7; padding: 10px; }
+.input-group input:focus, .input-group select:focus { outline: none; border-color: #C9A24D; }
+.input-group input:disabled, .input-group select:disabled { opacity: 0.6; cursor: not-allowed; background-color: #27272a; }
+
+/* Estructura del Formulario */
+.form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+}
+
+.half-width { flex: 1; }
+.full-width { width: 100%; }
+
+/* Modal más amplio para soportar galería de imágenes */
+.modal-medium {
+  max-width: 650px !important; 
+}
+
+.form-row-3 {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.form-row-3 .input-group {
+  flex: 1;
+}
+
+/* --- GALERÍA DE IMÁGENES --- */
+.images-gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 6px;
+  padding: 12px;
+  background-color: #121212;
+  border: 1px solid #27272a;
+  border-radius: 8px;
+  min-height: 100px;
+}
+
+.images-gallery.images-error {
+  border-color: #ef4444;
+}
+
+.image-preview-item {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid #3f3f46;
+  transition: border-color 0.2s;
+}
+
+.image-preview-item.is-principal {
+  border-color: #C9A24D;
+}
+
+.image-preview-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-actions {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  display: flex;
+  gap: 2px;
+}
+
+.btn-star, .btn-remove-img {
+  background: rgba(0,0,0,0.7);
+  border: none;
+  color: #a1a1aa;
+  cursor: pointer;
+  padding: 3px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.btn-star:hover, .btn-star.active {
+  color: #C9A24D;
+}
+
+.btn-remove-img:hover {
+  color: #ef4444;
+}
+
+.principal-badge {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(201, 162, 77, 0.9);
+  color: #000;
+  font-size: 10px;
+  font-weight: 600;
+  text-align: center;
+  padding: 2px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.image-upload-btn {
+  width: 90px;
+  height: 90px;
+  border: 2px dashed #3f3f46;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: #71717a;
+  cursor: pointer;
+  font-size: 11px;
+  transition: all 0.2s;
+}
+
+.image-upload-btn:hover {
+  border-color: #C9A24D;
+  color: #C9A24D;
+}
+
+.uploading-text {
+  font-size: 11px;
+  color: #C9A24D;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* --- NUEVO DISEÑO: STOCK POR TALLAS --- */
+.sizes-stock-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+/* Contenedor que agrupa la etiqueta de la talla y el input */
+.size-input-wrapper {
+  display: flex;
+  align-items: stretch;
+  background-color: #18181b;
+  border: 1px solid #3f3f46;
+  border-radius: 6px;
+  overflow: hidden;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  width: 90px; /* Ancho fijo para que todas las pastillas se vean iguales */
+}
+
+/* Efecto focus en todo el borde cuando se escribe en el input */
+.size-input-wrapper:focus-within {
+  border-color: #C9A24D;
+  box-shadow: 0 0 0 2px rgba(201, 162, 77, 0.15);
+}
+
+/* La pastilla izquierda con el número de la talla */
+.size-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #27272a;
+  color: #C9A24D;
+  font-weight: 600;
+  font-size: 13px;
+  padding: 0 10px;
+  border-right: 1px solid #3f3f46;
+  min-width: 38px; /* Para que las tallas como "10.5" encajen bien sin desajustarse */
+}
+
+/* El input limpio a la derecha */
+.size-amount-input {
+  width: 100%;
+  border: none !important;
+  background-color: transparent !important;
+  color: #e4e4e7;
+  font-size: 14px;
+  padding: 8px 6px !important;
+  text-align: center;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Ocultar las flechas feas de los inputs numéricos */
+.size-amount-input::-webkit-outer-spin-button,
+.size-amount-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.size-amount-input[type=number] {
+  -moz-appearance: textfield; /* Para Firefox antiguo/terco */
+  appearance: textfield;      /* La propiedad estándar que pide tu editor */
+}
+
+/* Validaciones y Errores */
+.required-asterisk { color: #ef4444; margin-left: 4px; font-weight: bold; }
+.input-error { border-color: #ef4444 !important; }
+.input-error:focus { box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.15) !important; }
+
+.error-text {
+  color: #ef4444;
+  font-size: 13px;
+  margin-top: 4px;
+  display: block;
+  font-weight: 500;
+  animation: fadeIn 0.3s ease-in-out; 
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 500px) {
+  .form-row { flex-direction: column; }
+}

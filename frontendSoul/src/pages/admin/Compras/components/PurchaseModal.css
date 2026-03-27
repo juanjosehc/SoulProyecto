@@ -1,0 +1,216 @@
+/* src/pages/admin/Compras/components/PurchaseModal.css */
+.modal-large-purchase {
+  max-width: 750px !important;
+}
+
+/* Grilla superior de 3 columnas */
+.purchase-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+/* Base Inputs y Selects */
+.input-group label, .input-group-small label {
+  display: block;
+  color: #e4e4e7;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.input-group input, 
+.input-group select,
+.input-group-small input,
+.input-group-small select {
+  width: 100%;
+  padding: 10px 12px;
+  background-color: #18181b;
+  border: 1px solid #3f3f46;
+  border-radius: 6px;
+  color: #e4e4e7;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  font-family: inherit;
+  outline: none;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+/* Inputs de fechas e iconos de select */
+.date-input::-webkit-calendar-picker-indicator {
+  filter: invert(1) brightness(0.7);
+  cursor: pointer;
+}
+
+.custom-select {
+  appearance: none; 
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23a1a1aa%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  padding-right: 40px; 
+  cursor: pointer;
+}
+
+.custom-select option { background-color: #18181b; color: #e4e4e7; padding: 10px; }
+.input-group input:focus, .input-group-small input:focus, .custom-select:focus { border-color: #C9A24D; box-shadow: 0 0 0 2px rgba(201, 162, 77, 0.15); }
+.input-group input:disabled, .input-group-small input:disabled, .custom-select:disabled { opacity: 0.6; cursor: not-allowed; background-color: #27272a; }
+
+/* --- SECCIÓN AGREGAR PRODUCTO (Fila de 4 elementos) --- */
+.add-product-section {
+  background-color: #1f1f22;
+  border: 1px solid #27272a;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+.section-subtitle {
+  font-size: 16px;
+  color: #C9A24D;
+  margin: 0 0 16px 0;
+  font-weight: 600;
+}
+
+.add-product-row {
+  display: flex;
+  align-items: flex-start; /* Evita que el botón se mueva cuando sale el error */
+  gap: 16px;
+}
+
+.input-group-small {
+  flex: 1;
+  position: relative;
+  padding-bottom: 20px; /* Espacio reservado para el texto de error sin romper el diseño */
+}
+
+.btn-agregar {
+  background-color: #C9A24D;
+  color: #18181b;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  padding: 0 24px;
+  height: 40px; /* Misma altura que el input */
+  margin-top: 26px; /* Para alinearse con los inputs bajando el espacio del label */
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-agregar:hover {
+  background-color: #a88538;
+}
+
+/* --- TABLA DE CARRITO --- */
+.cart-section {
+  margin-top: 16px;
+}
+
+.cart-table-container {
+  background-color: #18181b;
+  border: 1px solid #27272a;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  transition: border-color 0.2s;
+}
+
+.cart-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.cart-table th {
+  padding: 12px 16px;
+  background-color: #27272a;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  border-bottom: 1px solid #3f3f46;
+}
+
+.cart-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #27272a;
+  color: #a1a1aa;
+  font-size: 14px;
+}
+
+.cart-table tr:last-child td { border-bottom: none; }
+.cart-prod-name { color: #e4e4e7 !important; font-weight: 500; }
+.cart-total-cell { color: #C9A24D !important; font-weight: 500; }
+
+.btn-remove-item {
+  background: none;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  padding: 4px;
+  transition: all 0.2s;
+  border-radius: 4px;
+}
+.btn-remove-item:hover { background-color: rgba(239, 68, 68, 0.1); }
+.cart-empty { text-align: center; color: #71717a !important; font-style: italic; padding: 24px !important; }
+
+/* Total de la compra */
+.cart-grand-total {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background-color: #1f1f22;
+  border-radius: 8px;
+  border: 1px solid #27272a;
+}
+
+.cart-grand-total span:first-child { color: #a1a1aa; font-size: 15px; }
+.grand-total-amount { color: #C9A24D; font-size: 20px; font-weight: 700; }
+
+/* --- ESTILOS DE VALIDACIÓN --- */
+.required-asterisk { color: #ef4444; margin-left: 4px; font-weight: bold; }
+.input-error { border-color: #ef4444 !important; }
+.input-error:focus { box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.15) !important; }
+.cart-error-border { border-color: #ef4444 !important; }
+
+/* Texto absoluto para que no rompa la fila del botón Agregar */
+.error-text-absolute {
+  color: #ef4444;
+  font-size: 12px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  font-weight: 500;
+  animation: fadeIn 0.3s ease-in-out; 
+}
+
+.error-text {
+  color: #ef4444;
+  font-size: 13px;
+  margin-top: 4px;
+  display: block;
+  font-weight: 500;
+  animation: fadeIn 0.3s ease-in-out; 
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsividad */
+@media (max-width: 650px) {
+  .purchase-grid-3 { grid-template-columns: 1fr; }
+  .add-product-row { flex-wrap: wrap; }
+  .input-group-small { min-width: calc(50% - 8px); }
+  .btn-agregar { width: 100%; margin-top: 0; }
+}

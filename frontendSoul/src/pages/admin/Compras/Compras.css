@@ -1,0 +1,145 @@
+/* src/pages/admin/Compras/Compras.css */
+.purchases-module { display: flex; flex-direction: column; gap: 24px; }
+
+/* Cabecera y Buscador */
+.purchases-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.title-section { display: flex; align-items: center; gap: 12px; }
+.title-icon { color: #ffffff; }
+.title-section h1 { margin: 0; font-size: 24px; font-weight: 600; }
+.title-section p { margin: 4px 0 0 0; color: #a1a1aa; font-size: 14px; }
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.search-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon { position: absolute; left: 12px; color: #71717a; }
+
+.search-input {
+  background-color: #18181b;
+  border: 1px solid #3f3f46;
+  color: #e4e4e7;
+  padding: 10px 12px 10px 38px;
+  border-radius: 6px;
+  font-size: 14px;
+  width: 260px;
+  transition: all 0.2s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #C9A24D;
+  box-shadow: 0 0 0 2px rgba(201, 162, 77, 0.15);
+}
+
+.search-input::placeholder { color: #71717a; }
+
+.btn-primary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #C9A24D;
+  color: #18181b;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-primary:hover { background-color: #a88538; }
+
+/* Tabla */
+.table-container {
+  background-color: #18181b;
+  border: 1px solid #27272a;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.purchases-table { width: 100%; border-collapse: collapse; text-align: left; }
+.purchases-table th, .purchases-table td { padding: 16px 20px; border-bottom: 1px solid #27272a; font-size: 14px; }
+.purchases-table th { color: #ffffff; font-weight: 600; }
+.purchases-table td { color: #a1a1aa; }
+.purchases-table tr:last-child td { border-bottom: none; }
+
+/* Estados específicos para compras */
+.status-badge-purchase {
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  display: inline-block;
+  min-width: 80px; 
+  text-align: center;
+  font-weight: 500;
+}
+
+.status-completed { background-color: rgba(34, 197, 94, 0.1); color: #22c55e; }
+.status-pending { background-color: rgba(234, 179, 8, 0.1); color: #eab308; } /* Amarillo para pendiente */
+.status-cancelled { background-color: rgba(239, 68, 68, 0.1); color: #ef4444; }
+
+/* Botones de acción */
+.action-buttons { display: flex; gap: 12px; }
+.btn-action { background: none; border: none; color: #a1a1aa; cursor: pointer; padding: 4px; transition: color 0.2s; }
+.btn-action:hover { color: #ffffff; }
+.btn-delete:hover { color: #ef4444 !important; }
+
+.modal-small { max-width: 450px !important; }
+.btn-danger {
+  background-color: #ef4444;
+  color: #ffffff;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+.btn-danger:hover { background-color: #dc2626; }
+
+/* --- Paginación --- */
+.pagination-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.btn-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #18181b;
+  color: #e4e4e7;
+  border: 1px solid #3f3f46;
+  padding: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-page:hover:not(:disabled) {
+  background-color: #27272a;
+  border-color: #C9A24D;
+  color: #C9A24D;
+}
+
+.btn-page:disabled { opacity: 0.4; cursor: not-allowed; }
+.page-indicator { color: #a1a1aa; font-size: 14px; font-weight: 500; }

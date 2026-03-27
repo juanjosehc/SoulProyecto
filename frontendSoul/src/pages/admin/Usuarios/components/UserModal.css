@@ -1,0 +1,113 @@
+/* src/pages/admin/Usuarios/components/UserModal.css */
+
+/* Reutilizamos las clases genéricas que ya tienes para el fondo oscuro y inputs */
+.asterisk {
+  color: #ef4444; /* Rojo vibrante */
+  margin-left: 2px;
+  font-weight: bold;
+}
+
+.optional-text {
+  color: #71717a;
+  font-size: 12px;
+  font-weight: normal;
+}
+
+/* Estilos específicos para la lista desplegable del Rol */
+.role-select {
+  background-color: #121212;
+  border: 1px solid #27272a;
+  color: #ffffff;
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
+  appearance: none; /* Quita la flecha fea por defecto de los navegadores */
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 16px;
+}
+
+.role-select:focus {
+  border-color: #C9A24D;
+}
+
+.role-select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-image: none; /* Oculta la flecha si está bloqueado */
+}
+
+/* --- ESTILOS DE VALIDACIÓN Y ERRORES --- */
+.required-asterisk {
+  color: #ef4444;
+  margin-left: 4px;
+  font-weight: bold;
+}
+
+.input-error {
+  border-color: #ef4444 !important;
+}
+
+.input-error:focus {
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.15) !important;
+}
+
+.error-text {
+  color: #ef4444;
+  font-size: 13px;
+  margin-top: 4px; /* Un poco de margen superior para separarlo del input */
+  display: block; /* Asegura que baje a la siguiente línea */
+  font-weight: 500;
+  animation: fadeIn 0.3s ease-in-out; 
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Estructura para organizar los inputs a dos columnas (Opcional, si lo deseas) */
+.form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Base Inputs y Selects dentro del modal (por si no las tienes heredadas) */
+.input-group label {
+  display: block;
+  color: #e4e4e7;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.input-group input, 
+.input-group select {
+  width: 100%;
+  padding: 10px 12px;
+  background-color: #18181b;
+  border: 1px solid #3f3f46;
+  border-radius: 6px;
+  color: #e4e4e7;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  box-sizing: border-box; /* Previene que se desborden */
+}
+
+.input-group input:focus, 
+.input-group select:focus {
+  outline: none;
+  border-color: #C9A24D;
+}
+
+.input-group input:disabled, 
+.input-group select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #27272a;
+}

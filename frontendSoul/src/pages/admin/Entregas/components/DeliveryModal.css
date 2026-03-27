@@ -1,0 +1,102 @@
+/* src/pages/admin/Entregas/components/DeliveryModal.css */
+.modal-medium-delivery {
+  max-width: 600px !important;
+}
+
+.form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+}
+
+.half-width { flex: 1; }
+.full-width { width: 100%; }
+
+/* Base Inputs */
+.input-group label {
+  display: block;
+  color: #e4e4e7;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.input-group input, 
+.textarea-field {
+  width: 100%;
+  padding: 10px 12px;
+  background-color: #18181b;
+  border: 1px solid #3f3f46;
+  border-radius: 6px;
+  color: #e4e4e7;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  font-family: inherit;
+  outline: none;
+}
+
+/* Fechas */
+.input-group input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) brightness(0.7);
+  cursor: pointer;
+}
+
+/* Select Personalizado */
+.custom-select {
+  width: 100%;
+  padding: 10px 12px;
+  background-color: #18181b;
+  border: 1px solid #3f3f46;
+  border-radius: 6px;
+  color: #e4e4e7;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  font-family: inherit;
+  outline: none;
+  
+  appearance: none; 
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23a1a1aa%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  padding-right: 40px; 
+  cursor: pointer;
+}
+
+.custom-select option { background-color: #18181b; color: #e4e4e7; padding: 10px; }
+.textarea-field { resize: vertical; min-height: 80px; }
+.input-group input:focus, .custom-select:focus, .textarea-field:focus { border-color: #C9A24D; box-shadow: 0 0 0 2px rgba(201, 162, 77, 0.15); }
+.input-group input:disabled, .custom-select:disabled, .textarea-field:disabled { opacity: 0.6; cursor: not-allowed; background-color: #27272a; }
+
+/* --- ESTILOS DE VALIDACIÓN Y ERRORES --- */
+.required-asterisk { color: #ef4444; margin-left: 4px; font-weight: bold; }
+.input-error { border-color: #ef4444 !important; }
+.input-error:focus { box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.15) !important; }
+
+.error-text {
+  color: #ef4444;
+  font-size: 13px;
+  margin-top: 4px;
+  display: block;
+  font-weight: 500;
+  animation: fadeIn 0.3s ease-in-out; 
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 500px) {
+  .form-row { flex-direction: column; gap: 16px; }
+}

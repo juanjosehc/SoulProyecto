@@ -1,0 +1,275 @@
+/* Contenedor principal a pantalla completa */
+.login-page {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  background-color: #18181b;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  margin: 0;
+  padding: 0;
+  overflow: hidden; /* Evita scrolls innecesarios */
+}
+
+/* --- PANEL IZQUIERDO --- */
+.login-brand-panel {
+  flex: 1;
+  background: linear-gradient(135deg, #09090b 0%, #18181b 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid #27272a;
+}
+
+.brand-content {
+  text-align: center;
+  animation: fadeIn 1s ease-out;
+}
+
+.brand-logo {
+  font-size: 6rem;
+  font-weight: 800;
+  letter-spacing: 6px;
+  color: #ffffff;
+  margin: 0;
+  font-family: 'Georgia', 'Times New Roman', serif; /* Tipografía elegante para el logo */
+  text-shadow: 0px 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.brand-tagline {
+  color: #C9A24D;
+  font-size: 1.3rem;
+  margin-top: 10px;
+  font-weight: 500;
+  letter-spacing: 1px;
+}
+
+/* --- PANEL DERECHO --- */
+.login-form-panel {
+  flex: 1;
+  background-color: #121212;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-form-wrapper {
+  width: 100%;
+  max-width: 400px;
+  padding: 40px;
+  animation: slideUp 0.6s ease-out;
+}
+
+.login-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 8px 0;
+}
+
+.login-subtitle {
+  color: #a1a1aa;
+  font-size: 0.95rem;
+  margin-bottom: 32px;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Inputs */
+.input-group label {
+  display: block;
+  color: #e4e4e7;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 14px 16px; /* Padding un poco más amplio para que se vea premium */
+  background-color: #18181b;
+  border: 1px solid #3f3f46;
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: #C9A24D;
+  box-shadow: 0 0 0 2px rgba(201, 162, 77, 0.15);
+}
+
+.input-error {
+  border-color: #ef4444 !important;
+}
+
+/* Enlaces */
+.forgot-password-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -8px;
+}
+
+.forgot-password-link {
+  color: #a1a1aa;
+  font-size: 0.85rem;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.forgot-password-link:hover {
+  color: #C9A24D;
+}
+
+/* Botón Principal */
+.btn-login {
+  background-color: #C9A24D;
+  color: #18181b;
+  font-size: 1rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 8px;
+  padding: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+  margin-top: 8px;
+}
+
+.btn-login:hover {
+  background-color: #a88538;
+}
+
+.btn-login:active {
+  transform: scale(0.98);
+}
+
+/* Errores y Registro */
+.login-error {
+  background-color: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+  text-align: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.register-prompt {
+  text-align: center;
+  margin-top: 40px;
+  color: #a1a1aa;
+  font-size: 0.95rem;
+}
+
+.register-link {
+  color: #C9A24D;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.register-link:hover {
+  color: #a88538;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- RESPONSIVIDAD PARA CELULARES --- */
+@media (max-width: 768px) {
+  .login-page {
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  
+  .login-brand-panel {
+    flex: 0.3;
+    min-height: 250px;
+    border-right: none;
+    border-bottom: 1px solid #27272a;
+  }
+
+  .brand-logo {
+    font-size: 4rem;
+  }
+
+  .login-form-panel {
+    flex: 0.7;
+    align-items: flex-start;
+    padding-top: 30px;
+  }
+  
+  .login-form-wrapper {
+    padding: 20px;
+  }
+}
+
+/* --- ESTILOS NUEVOS PARA EL BOTÓN DEL CATÁLOGO --- */
+
+.divider {
+  text-align: center;
+  color: #71717a;
+  font-size: 0.85rem;
+  margin: 4px 0;
+  position: relative;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 45%;
+  height: 1px;
+  background-color: #27272a;
+}
+
+.divider::before {
+  left: 0;
+}
+
+.divider::after {
+  right: 0;
+}
+
+.btn-catalog-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: transparent;
+  color: #e4e4e7;
+  font-size: 1rem;
+  font-weight: 600;
+  border: 1px solid #3f3f46;
+  border-radius: 8px;
+  padding: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-catalog-link:hover {
+  background-color: rgba(201, 162, 77, 0.1);
+  border-color: #C9A24D;
+  color: #C9A24D;
+}
+
+.btn-catalog-link:active {
+  transform: scale(0.98);
+}

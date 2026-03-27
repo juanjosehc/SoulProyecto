@@ -1,0 +1,170 @@
+/* src/pages/admin/Pedidos/Pedidos.css */
+.orders-module { display: flex; flex-direction: column; gap: 24px; }
+.orders-header { display: flex; justify-content: space-between; align-items: center; }
+
+.title-section { display: flex; align-items: center; gap: 12px; }
+.title-icon { color: #ffffff; }
+.title-section h1 { margin: 0; font-size: 24px; font-weight: 600; }
+.title-section p { margin: 4px 0 0 0; color: #a1a1aa; font-size: 14px; }
+
+.btn-primary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #C9A24D;
+  color: #18181b;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-primary:hover { background-color: #a88538; }
+
+/* Contenedor doble para los filtros como en tu imagen */
+.filters-container {
+  display: flex;
+  gap: 16px;
+}
+
+.filter-search {
+  flex: 2;
+}
+
+.search-input:focus {
+  border-color: #C9A24D !important;
+  box-shadow: 0 0 0 2px rgba(201, 162, 77, 0.15) !important;
+}
+
+.status-filter-select {
+  flex: 1;
+  background-color: #18181b;
+  border: 1px solid #27272a;
+  color: #ffffff;
+  padding: 0 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.status-filter-select:focus { border-color: #C9A24D; }
+
+/* Tabla */
+.table-container {
+  background-color: #18181b;
+  border: 1px solid #27272a;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.orders-table { width: 100%; border-collapse: collapse; text-align: left; }
+.orders-table th, .orders-table td { padding: 16px 20px; border-bottom: 1px solid #27272a; font-size: 14px; }
+.orders-table th { color: #ffffff; font-weight: 600; }
+.orders-table td { color: #a1a1aa; }
+
+.order-code { color: #e4e4e7 !important; font-weight: 500; }
+.client-name { color: #e4e4e7 !important; }
+.total-cell { color: #C9A24D !important; font-weight: 600; }
+
+/* Estilos de progreso del pedido */
+.order-status-badge {
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+/* Pendiente: Tu dorado característico */
+.order-pendiente { background-color: rgba(201, 162, 77, 0.1); color: #C9A24D; }
+/* Activo: Verde éxito */
+.order-completado { background-color: rgba(34, 197, 94, 0.1); color: #22c55e; }
+/* En tránsito: Azul logístico */
+.order-transito { background-color: rgba(59, 130, 246, 0.1); color: #60a5fa; }
+/* Anulada: Rojo alerta */
+.order-anulada { background-color: rgba(239, 68, 68, 0.1); color: #ef4444; }
+
+/* Clases usadas desde JSX (status-badge) */
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+}
+.status-pending { background-color: rgba(201, 162, 77, 0.1); color: #C9A24D; }
+.status-transit { background-color: rgba(59, 130, 246, 0.1); color: #60a5fa; }
+.status-completed { background-color: rgba(34, 197, 94, 0.1); color: #22c55e; }
+.status-cancelled { background-color: rgba(239, 68, 68, 0.1); color: #ef4444; }
+
+/* Dropdown de estado en tabla */
+.status-select {
+  background-color: rgba(201, 162, 77, 0.1);
+  color: #C9A24D;
+  border: 1px solid rgba(201, 162, 77, 0.3);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  min-width: 110px;
+}
+.status-select:focus { border-color: #C9A24D; }
+.status-select option { background-color: #18181b; color: #e4e4e7; }
+
+/* Botones de acción */
+.action-buttons { display: flex; gap: 12px; }
+.btn-action { background: none; border: none; color: #a1a1aa; cursor: pointer; padding: 4px; transition: color 0.2s; }
+.btn-action:hover { color: #ffffff; }
+.btn-action.power-off { color: #ef4444; }
+.btn-delete:hover { color: #ef4444 !important; }
+
+/* Modal y Botón de eliminar */
+.modal-small { max-width: 450px !important; }
+.btn-danger {
+  background-color: #ef4444;
+  color: #ffffff;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+.btn-danger:hover { background-color: #dc2626; }
+
+/* --- Paginación --- */
+.pagination-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.btn-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #18181b;
+  color: #e4e4e7;
+  border: 1px solid #3f3f46;
+  padding: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-page:hover:not(:disabled) {
+  background-color: #27272a;
+  border-color: #C9A24D;
+  color: #C9A24D;
+}
+
+.btn-page:disabled { opacity: 0.4; cursor: not-allowed; }
+.page-indicator { color: #a1a1aa; font-size: 14px; font-weight: 500; }

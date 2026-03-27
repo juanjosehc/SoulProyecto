@@ -1,0 +1,235 @@
+/* src/pages/admin/RolesPermisos/components/RoleModal.css */
+
+/* Fondo oscuro translúcido que cubre toda la pantalla */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Asegura que esté por encima de todo */
+}
+
+/* La caja del modal */
+.modal-container {
+  background-color: #18181b;
+  border: 1px solid #27272a;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 550px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #27272a;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.btn-close {
+  background: none;
+  border: none;
+  color: #a1a1aa;
+  cursor: pointer;
+  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-close:hover {
+  color: #ffffff;
+}
+
+.modal-body {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.input-group, .permissions-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.input-group label, .permissions-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.input-group input {
+  background-color: #121212;
+  border: 1px solid #27272a;
+  color: #ffffff;
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input-group input:focus {
+  border-color: #C9A24D;
+}
+
+.input-group input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.permissions-subtitle {
+  font-size: 13px;
+  color: #a1a1aa;
+  margin: 0 0 12px 0;
+}
+
+/* Grilla para los checkboxes */
+.permissions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #121212;
+  border: 1px solid #27272a;
+  padding: 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.checkbox-label:hover {
+  border-color: #C9A24D;
+}
+
+.checkbox-label.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.checkbox-label.disabled:hover {
+  border-color: #27272a;
+}
+
+/* Personalizar el checkbox base */
+.checkbox-label input[type="checkbox"] {
+  accent-color: #C9A24D; /* Colorea el check de dorado */
+  width: 16px;
+  height: 16px;
+  cursor: inherit;
+}
+
+.checkbox-label span {
+  font-size: 14px;
+  color: #e4e4e7;
+}
+
+/* Botones del pie del modal */
+.modal-footer {
+  padding: 20px 24px;
+  border-top: 1px solid #27272a;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: #ffffff;
+  border: 1px solid #27272a;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.btn-secondary:hover {
+  background-color: #27272a;
+}
+
+.btn-primary-modal {
+  background-color: #C9A24D;
+  color: #18181b;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+
+.btn-primary-modal:hover {
+  background-color: #a88538;
+}
+
+/* src/pages/admin/RolesPermisos/components/RoleModal.css */
+
+/* ... (resto de estilos existentes) ... */
+
+
+/* --- NUEVA CLASE PARA RESALTAR EL PERMISO SELECCIONADO --- */
+.checkbox-label.selected {
+  border-color: #C9A24D; /* Borde dorado vibrante */
+  background-color: rgba(201, 162, 77, 0.05); /* Sutil fondo dorado semitransparente */
+}
+
+/* Para asegurar que no brille en modo vista, ya lo controlamos con opacity, pero agregamos esto */
+.checkbox-label.selected.disabled {
+  background-color: transparent;
+}
+
+/* --- ESTILOS DE VALIDACIÓN Y ERRORES --- */
+
+/* Asterisco rojo */
+.required-asterisk {
+  color: #ef4444;
+  margin-left: 4px;
+  font-weight: bold;
+}
+
+/* Borde rojo para el input cuando hay error */
+.input-error {
+  border-color: #ef4444 !important;
+}
+
+/* Sombra roja al hacer focus en el input con error */
+.input-error:focus {
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.15) !important;
+}
+
+/* Texto de advertencia debajo del input */
+.error-text {
+  color: #ef4444;
+  font-size: 13px;
+  margin-top: 2px;
+  font-weight: 500;
+  animation: fadeIn 0.3s ease-in-out; /* Pequeño efecto de aparición */
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}

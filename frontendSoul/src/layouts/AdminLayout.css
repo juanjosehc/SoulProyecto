@@ -1,0 +1,109 @@
+/* src/layouts/AdminLayout.css */
+
+.admin-container {
+  display: flex;
+  min-height: 100vh;
+  background-color: #121212; /* Fondo oscuro principal del dashboard */
+  color: #ffffff;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* --- ESTILOS DEL SIDEBAR --- */
+.sidebar {
+  width: 250px;
+  background-color: #18181b; /* Fondo un poco más claro para el menú */
+  border-right: 1px solid #27272a;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-logo {
+  padding: 24px 20px;
+  border-bottom: 1px solid #27272a;
+}
+
+.sidebar-logo h2 {
+  color: #C9A24D; /* Color dorado/amarillo estilo SOUL */
+  margin: 0 0 4px 0;
+  font-size: 24px;
+  letter-spacing: 1px;
+}
+
+.sidebar-logo p {
+  margin: 0;
+  font-size: 13px;
+  color: #a1a1aa;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 20px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px;
+  color: #a1a1aa;
+  text-decoration: none;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.nav-item:hover {
+  background-color: #27272a;
+  color: #ffffff;
+}
+
+.nav-item.active {
+  background-color: #C9A24D; /* Botón activo en amarillo */
+  color: #18181b;
+  font-weight: 500;
+  border-radius: 4px;
+  margin: 0 12px; /* Margen para que no toque los bordes del sidebar */
+  padding: 12px;
+}
+
+/* --- FOOTER DEL SIDEBAR --- */
+.sidebar-footer {
+  padding: 20px 24px;
+  border-top: 1px solid #27272a;
+}
+
+.sidebar-user-info {
+  margin-bottom: 12px;
+}
+
+.sidebar-user-name {
+  font-size: 13px;
+  color: #C9A24D;
+  font-weight: 500;
+}
+
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: none;
+  border: none;
+  color: #a1a1aa;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0;
+  transition: color 0.2s ease;
+}
+
+.logout-btn:hover {
+  color: #ef4444; /* Rojo suave al pasar el mouse para "cerrar sesión" */
+}
+
+/* --- ÁREA PRINCIPAL --- */
+.main-content {
+  flex: 1;
+  padding: 32px;
+  overflow-y: auto;
+}

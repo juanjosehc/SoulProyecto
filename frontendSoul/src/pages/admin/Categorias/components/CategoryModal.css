@@ -1,0 +1,101 @@
+/* src/pages/admin/Categorias/components/CategoryModal.css */
+/* Reutilizamos las variables base, solo añadimos el estilo específico del textarea */
+
+.textarea-field {
+  background-color: #121212;
+  border: 1px solid #27272a;
+  color: #ffffff;
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+  font-family: inherit;
+  resize: vertical; /* Permite al usuario estirar el cuadro solo hacia abajo */
+}
+
+.textarea-field:focus {
+  border-color: #C9A24D;
+}
+
+.textarea-field:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Base Inputs y textareas */
+.input-group label {
+  display: block;
+  color: #e4e4e7;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.input-group input, 
+.textarea-custom {
+  width: 100%;
+  padding: 10px 12px;
+  background-color: #18181b;
+  border: 1px solid #3f3f46;
+  border-radius: 6px;
+  color: #e4e4e7;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+/* Evitar que el textarea se redimensione horizontalmente */
+.textarea-custom {
+  resize: vertical; 
+  min-height: 80px;
+}
+
+.input-group input:focus, 
+.textarea-custom:focus {
+  outline: none;
+  border-color: #C9A24D;
+}
+
+.input-group input:disabled, 
+.textarea-custom:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #27272a;
+}
+
+/* --- ESTILOS DE VALIDACIÓN Y ERRORES --- */
+.required-asterisk {
+  color: #ef4444;
+  margin-left: 4px;
+  font-weight: bold;
+}
+
+.input-error {
+  border-color: #ef4444 !important;
+}
+
+.input-error:focus {
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.15) !important;
+}
+
+.error-text {
+  color: #ef4444;
+  font-size: 13px;
+  margin-top: 4px;
+  display: block;
+  font-weight: 500;
+  animation: fadeIn 0.3s ease-in-out; 
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
