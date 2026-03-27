@@ -204,15 +204,14 @@ const solicitarRecuperacion = async (req, res) => {
       return res.status(403).json({ error: 'Cuenta inactiva. Contacta al administrador.' });
     }
 
-    // Generar token único (15 mins de expiración)
+    // Generar token único (15 mins de expiración manejados por DB para evitar choques de Timezone)
     const resetToken = crypto.randomBytes(32).toString('hex');
     const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
-    const expireDate = new Date(Date.now() + 15 * 60 * 1000); // 15 minutos
 
     if (tipo === 'usuario') {
-      await pool.query('UPDATE usuarios SET reset_password_token = $1, reset_password_expires = $2 WHERE id = $3', [hashedToken, expireDate, userFound.id]);
+      await pool.query("UPDATE usuarios SET reset_password_token = $1, reset_password_expires = NOW() + INTERVAL '15 minutes' WHERE id = $2", [hashedToken, userFound.id]);
     } else {
-      await pool.query('UPDATE clientes SET reset_password_token = $1, reset_password_expires = $2 WHERE id = $3', [hashedToken, expireDate, userFound.id]);
+      await pool.query("UPDATE clientes SET reset_password_token = $1, reset_password_expires = NOW() + INTERVAL '15 minutes' WHERE id = $2", [hashedToken, userFound.id]);
     }
 
     const resetLink = `${FRONTEND_URL}/reset-password?token=${resetToken}`;
@@ -278,12 +277,13 @@ const restablecerPassword = async (req, res) => {
       return res.status(400).json({ error: 'Token y nueva contraseña son obligatorios' });
     }
 
-    if (newPassword.length < 6) {
+    if (newPassword.trim().length < 6) {
       return res.status(400).json({ error: 'La contraseña debe tener al menos 6 caracteres' });
     }
 
-    // Hashear el token entrante para compararlo con la DB
-    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+    // Hashear el token entrante para compararlo con la DB quitando espacios invisibles
+    const cleanToken = token.trim();
+    const hashedToken = crypto.createHash('sha256').update(cleanToken).digest('hex');
 
     let userFound = null;
     let tipo = null;
