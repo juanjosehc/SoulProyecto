@@ -20,8 +20,8 @@ export const UserModal = ({ isOpen, onClose, mode, userData, onSave }) => {
         const respuesta = await fetch('http://localhost:3000/api/roles');
         const datos = await respuesta.json();
         if (Array.isArray(datos)) {
-          // Filtrar roles que estén activos
-          setRolesActivos(datos.filter(r => r.is_active));
+          // El controlador devuelve { name, isActive }
+          setRolesActivos(datos.filter(r => r.isActive));
         }
       } catch (error) {
         console.error('Error cargando roles:', error);
@@ -75,8 +75,8 @@ export const UserModal = ({ isOpen, onClose, mode, userData, onSave }) => {
       return;
     }
 
-    // Validación extra: el rol digitado debe existir en la lista de activos
-    const roleExists = rolesActivos.some(r => r.nombre === formData.role.trim());
+    // El controlador devuelve el campo "name"
+    const roleExists = rolesActivos.some(r => r.name === formData.role.trim());
     if (!roleExists) {
       setErrors({ role: true, roleMsg: 'Seleccione un rol válido de la lista' });
       return;
@@ -157,7 +157,7 @@ export const UserModal = ({ isOpen, onClose, mode, userData, onSave }) => {
               />
               <datalist id="dynamic-roles">
                 {rolesActivos.map(rol => (
-                  <option key={rol.id} value={rol.nombre} />
+                  <option key={rol.id} value={rol.name} />
                 ))}
               </datalist>
               
