@@ -1,5 +1,5 @@
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 
 /**
  * Genera un PDF estándar para los módulos.
@@ -64,7 +64,7 @@ export const generateRecordPDF = (title, metaInfo, columns, rows, total, filenam
   startY += 6;
 
   // Generar la tabla de productos
-  doc.autoTable({
+  autoTable(doc, {
     startY: startY,
     head: [columns],
     body: rows,
