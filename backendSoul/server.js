@@ -11,6 +11,7 @@ const categoriaRoutes = require('./src/routes/categoriaRoutes');
 const productoRoutes = require('./src/routes/productoRoutes');
 const usuarioRoutes = require('./src/routes/usuarioRoutes');
 const rolRoutes = require('./src/routes/rolRoutes');
+const permisoRoutes = require('./src/routes/permisoRoutes');
 const proveedorRoutes = require('./src/routes/proveedorRoutes');
 const compraRoutes = require('./src/routes/compraRoutes');
 const clienteRoutes = require('./src/routes/clienteRoutes');
@@ -36,15 +37,16 @@ app.use('/api/productos', productoRoutes);
 app.use('/api/categorias', categoriaRoutes);
 
 // === RUTAS PROTEGIDAS (requieren autenticación + permisos) ===
-app.use('/api/usuarios', verificarToken, usuarioRoutes);
-app.use('/api/roles', verificarToken, verificarPermiso('roles'), rolRoutes);
-app.use('/api/proveedores', verificarToken, verificarPermiso('proveedores'), proveedorRoutes);
-app.use('/api/compras', verificarToken, verificarPermiso('compras'), compraRoutes);
+app.use('/api/permisos', verificarToken, verificarPermiso('MODULO_ROLES'), permisoRoutes); // Mismo permiso que roles
+app.use('/api/usuarios', verificarToken, usuarioRoutes); // Internamente validará, o se puede restringir si es necesario
+app.use('/api/roles', verificarToken, verificarPermiso('MODULO_ROLES'), rolRoutes);
+app.use('/api/proveedores', verificarToken, verificarPermiso('MODULO_PROVEEDORES'), proveedorRoutes);
+app.use('/api/compras', verificarToken, verificarPermiso('MODULO_COMPRAS'), compraRoutes);
 app.use('/api/clientes', verificarToken, clienteRoutes);
-app.use('/api/pedidos', verificarToken, verificarPermiso('pedidos'), pedidoRoutes);
-app.use('/api/ventas', verificarToken, verificarPermiso('ventas'), ventaRoutes);
-app.use('/api/entregas', verificarToken, verificarPermiso('entregas'), entregaRoutes);
-app.use('/api/dashboard', verificarToken, verificarPermiso('dashboard'), dashboardRoutes);
+app.use('/api/pedidos', verificarToken, verificarPermiso('MODULO_PEDIDOS'), pedidoRoutes);
+app.use('/api/ventas', verificarToken, verificarPermiso('MODULO_VENTAS'), ventaRoutes);
+app.use('/api/entregas', verificarToken, verificarPermiso('MODULO_ENTREGAS'), entregaRoutes);
+app.use('/api/dashboard', verificarToken, verificarPermiso('MODULO_DASHBOARD'), dashboardRoutes);
 
 // Iniciar servidor
 const PORT = process.env.PORT || 3000;

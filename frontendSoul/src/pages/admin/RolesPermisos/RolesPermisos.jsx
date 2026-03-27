@@ -121,7 +121,7 @@ export const RolesPermisos = () => {
     const term = searchTerm.toLowerCase();
     const matchName = role.name?.toLowerCase().includes(term) || false;
     const matchStatus = (role.isActive ? 'activo' : 'inactivo').includes(term);
-    const matchModules = role.permisos?.some(permiso => permiso.toLowerCase().includes(term)) || false;
+    const matchModules = role.permisos?.some(p => p.descripcion?.toLowerCase().includes(term)) || false;
     return matchName || matchStatus || matchModules;
   });
 
@@ -176,8 +176,8 @@ export const RolesPermisos = () => {
                   <td>
                     <div className="modules-badges-container">
                       {role.permisos && role.permisos.length > 0 ? (
-                        role.permisos.map((modulo, index) => (
-                          <span key={index} className="module-pill">{modulo}</span>
+                        role.permisos.map((modulo) => (
+                          <span key={modulo.id} className="module-pill">{modulo.descripcion}</span>
                         ))
                       ) : (
                         <span className="no-modules">Sin módulos asignados</span>

@@ -19,7 +19,13 @@ const login = async (req, res) => {
 
     // Primero buscar en usuarios del sistema
     const userResult = await pool.query(`
-      SELECT u.id, u.nombre, u.email, u.password_hash, u.is_active, r.nombre as rol, r.is_active as rol_activo, r.permisos
+      SELECT u.id, u.nombre, u.email, u.password_hash, u.is_active, r.nombre as rol, r.is_active as rol_activo,
+      COALESCE((
+        SELECT json_agg(p.nombre)
+        FROM rol_permisos rp
+        JOIN permisos p ON rp.permiso_id = p.id
+        WHERE rp.rol_id = r.id
+      ), '[]'::json) as permisos
       FROM usuarios u
       JOIN roles r ON u.rol_id = r.id
       WHERE u.email = $1

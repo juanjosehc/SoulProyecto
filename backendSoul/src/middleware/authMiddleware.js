@@ -36,14 +36,14 @@ const verificarPermiso = (permiso) => {
 
     const permisos = req.user.permisos || [];
 
-    // Si no tiene permisos configurados (array vacío), permitir acceso (backwards compatibility)
-    if (permisos.length === 0) {
-      return next();
+    // Si no tiene permisos, denegar acceso inmediatamente
+    if (!permisos || permisos.length === 0) {
+      return res.status(403).json({ error: `No tienes permisos configurados.` });
     }
 
-    // Comparar case-insensitive
-    const permisosNormalizados = permisos.map(p => p.toLowerCase());
-    if (permisosNormalizados.includes(permiso.toLowerCase())) {
+    // El array de permisos ahora contiene strings como 'MODULO_VENTAS'
+    const permisosNormalizados = permisos.map(p => p.toUpperCase());
+    if (permisosNormalizados.includes(permiso.toUpperCase())) {
       return next();
     }
 

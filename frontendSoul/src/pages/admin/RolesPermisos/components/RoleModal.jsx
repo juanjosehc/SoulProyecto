@@ -1,29 +1,36 @@
 import { X } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { getAuthHeaders } from '../../../../utils/auth';
 import './RoleModal.css';
 
-const modulosDisponibles = [
-  'Dashboard', 'Roles y permisos', 'Usuarios', 'Categorías',
-  'Productos', 'Proveedores', 'Compras', 'Clientes',
-  'Ventas', 'Pedidos', 'Entregas'
-];
+const API = 'http://localhost:3000/api';
 
 export const RoleModal = ({ isOpen, onClose, mode, roleData, onSave }) => {
   const [nombreRol, setNombreRol] = useState('');
-  const [permisos, setPermisos] = useState([]);
+  const [permisos, setPermisos] = useState([]); // Arreglo de IDs numéricos
+  const [modulosDisponibles, setModulosDisponibles] = useState([]);
   
-  // NUEVO: Estado para manejar el error de validación
   const [error, setError] = useState(false); 
 
   useEffect(() => {
-    if (isOpen && roleData && (mode === 'edit' || mode === 'view')) {
-      setNombreRol(roleData.name || '');
-      setPermisos(roleData.permisos || []); 
-      setError(false); // Limpiamos el error al abrir
-    } else if (isOpen && mode === 'create') {
-      setNombreRol('');
-      setPermisos([]);
-      setError(false); // Limpiamos el error al abrir
+    if (isOpen) {
+      // Cargar catálogo de permisos
+      fetch(`${API}/permisos`, { headers: getAuthHeaders() })
+        .then(res => res.json())
+        .then(data => {
+            if (Array.isArray(data)) setModulosDisponibles(data);
+        })
+        .catch(err => console.error("Error al cargar módulos", err));
+
+      if (roleData && (mode === 'edit' || mode === 'view')) {
+        setNombreRol(roleData.name || '');
+        setPermisos((roleData.permisos || []).map(p => p.id)); 
+        setError(false);
+      } else if (mode === 'create') {
+        setNombreRol('');
+        setPermisos([]);
+        setError(false);
+      }
     }
   }, [isOpen, mode, roleData]);
 
@@ -33,12 +40,12 @@ export const RoleModal = ({ isOpen, onClose, mode, roleData, onSave }) => {
   const title = mode === 'create' ? 'Registrar Rol' : mode === 'edit' ? 'Editar Rol' : 'Detalle del Rol';
   const buttonText = mode === 'create' ? 'Crear Rol' : 'Guardar Cambios';
 
-  const handleCheckboxChange = (modulo) => {
+  const handleCheckboxChange = (moduloId) => {
     if (isViewOnly) return;
-    if (permisos.includes(modulo)) {
-      setPermisos(permisos.filter(p => p !== modulo));
+    if (permisos.includes(moduloId)) {
+      setPermisos(permisos.filter(p => p !== moduloId));
     } else {
-      setPermisos([...permisos, modulo]);
+      setPermisos([...permisos, moduloId]);
     }
   };
 
@@ -98,16 +105,16 @@ export const RoleModal = ({ isOpen, onClose, mode, roleData, onSave }) => {
             
             <div className="permissions-grid">
               {modulosDisponibles.map((modulo) => {
-                const isChecked = permisos.includes(modulo);
+                const isChecked = permisos.includes(modulo.id);
                 return (
-                  <label key={modulo} className={`checkbox-label ${isChecked ? 'selected' : ''} ${isViewOnly ? 'disabled' : ''}`}>
+                  <label key={modulo.id} className={`checkbox-label ${isChecked ? 'selected' : ''} ${isViewOnly ? 'disabled' : ''}`}>
                     <input 
                       type="checkbox" 
                       checked={isChecked}
-                      onChange={() => handleCheckboxChange(modulo)}
+                      onChange={() => handleCheckboxChange(modulo.id)}
                       disabled={isViewOnly}
                     />
-                    <span>{modulo}</span>
+                    <span>{modulo.descripcion}</span>
                   </label>
                 );
               })}
