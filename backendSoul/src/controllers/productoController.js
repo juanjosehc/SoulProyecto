@@ -51,6 +51,7 @@ const obtenerProductosActivos = async (req, res) => {
         COALESCE(
           (SELECT json_agg(DISTINCT talla) FROM producto_tallas WHERE producto_id = p.id AND stock > 0), '[]'::json
         ) as sizes,
+        COALESCE((SELECT json_object_agg(talla, stock) FROM producto_tallas WHERE producto_id = p.id), '{}'::json) as "stockBySize",
         COALESCE((SELECT SUM(stock) FROM producto_tallas WHERE producto_id = p.id), 0) as stock
       FROM productos p
       JOIN categorias c ON p.categoria_id = c.id

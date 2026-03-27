@@ -43,7 +43,7 @@ app.use('/api/roles', verificarToken, verificarPermiso('MODULO_ROLES'), rolRoute
 app.use('/api/proveedores', verificarToken, verificarPermiso('MODULO_PROVEEDORES'), proveedorRoutes);
 app.use('/api/compras', verificarToken, verificarPermiso('MODULO_COMPRAS'), compraRoutes);
 app.use('/api/clientes', verificarToken, clienteRoutes);
-app.use('/api/pedidos', verificarToken, verificarPermiso('MODULO_PEDIDOS'), pedidoRoutes);
+app.use('/api/pedidos', verificarToken, pedidoRoutes);
 app.use('/api/ventas', verificarToken, verificarPermiso('MODULO_VENTAS'), ventaRoutes);
 app.use('/api/entregas', verificarToken, verificarPermiso('MODULO_ENTREGAS'), entregaRoutes);
 app.use('/api/dashboard', verificarToken, verificarPermiso('MODULO_DASHBOARD'), dashboardRoutes);

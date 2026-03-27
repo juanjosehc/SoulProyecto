@@ -156,21 +156,40 @@ export const Catalogo = () => {
     if (!size) return;
     
     const existingIndex = cart.findIndex(i => i.id === product.id && i.size === size);
+    const maxStock = product.stockBySize?.[size] || 0;
+
     if (existingIndex >= 0) {
       const updated = [...cart];
-      updated[existingIndex].quantity += 1;
-      setCart(updated);
+      if (updated[existingIndex].quantity < maxStock) {
+        updated[existingIndex].quantity += 1;
+        setCart(updated);
+        showToast(`${product.name} (Talla ${size}) agregado al carrito`);
+      } else {
+        showToast(`Lo sentimos, solo hay ${maxStock} unidades en stock.`);
+      }
     } else {
-      setCart([...cart, { 
-        id: product.id, name: product.name, price: product.price, 
-        size, quantity: 1, image: getMainImage(product) 
-      }]);
+      if (maxStock > 0) {
+        setCart([...cart, { 
+          id: product.id, name: product.name, price: product.price, 
+          size, quantity: 1, image: getMainImage(product),
+          maxStock: maxStock // Guardamos el stock máximo para controles en el drawer
+        }]);
+        showToast(`${product.name} (Talla ${size}) agregado al carrito`);
+      } else {
+        showToast('Producto sin stock en esta talla.');
+      }
     }
-    showToast(`${product.name} (Talla ${size}) agregado al carrito`);
   };
 
   const updateQuantity = (index, delta) => {
     const updated = [...cart];
+    const item = updated[index];
+    
+    if (delta > 0 && item.quantity >= item.maxStock) {
+      showToast(`Límite de stock alcanzado (${item.maxStock})`);
+      return;
+    }
+
     updated[index].quantity += delta;
     if (updated[index].quantity <= 0) {
       updated.splice(index, 1);
@@ -524,7 +543,13 @@ export const Catalogo = () => {
                           <div className="quantity-controls">
                             <button onClick={() => updateQuantity(index, -1)}><Minus size={14} /></button>
                             <span>{item.quantity}</span>
-                            <button onClick={() => updateQuantity(index, 1)}><Plus size={14} /></button>
+                            <button 
+                              onClick={() => updateQuantity(index, 1)}
+                              disabled={item.quantity >= item.maxStock}
+                              className={item.quantity >= item.maxStock ? 'btn-disabled' : ''}
+                            >
+                              <Plus size={14} />
+                            </button>
                           </div>
                           <button className="btn-close-cart" onClick={() => removeFromCart(index)}>
                             <Trash2 size={16} />

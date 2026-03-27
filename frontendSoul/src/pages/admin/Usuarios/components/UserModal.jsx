@@ -10,8 +10,25 @@ export const UserModal = ({ isOpen, onClose, mode, userData, onSave }) => {
     password: ''
   });
   
-  // NUEVO: Estado de errores manejado como objeto para múltiples inputs
   const [errors, setErrors] = useState({}); 
+  const [rolesActivos, setRolesActivos] = useState([]);
+
+  useEffect(() => {
+    // Cargar dinámicamente roles activos de la API
+    const fetchRoles = async () => {
+      try {
+        const respuesta = await fetch('http://localhost:3000/api/roles');
+        const datos = await respuesta.json();
+        if (Array.isArray(datos)) {
+          // Filtrar roles que estén activos
+          setRolesActivos(datos.filter(r => r.is_active));
+        }
+      } catch (error) {
+        console.error('Error cargando roles:', error);
+      }
+    };
+    if (isOpen) fetchRoles();
+  }, [isOpen]);
 
   useEffect(() => {
     if (isOpen && userData && (mode === 'edit' || mode === 'view')) {
@@ -55,6 +72,13 @@ export const UserModal = ({ isOpen, onClose, mode, userData, onSave }) => {
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
+      return;
+    }
+
+    // Validación extra: el rol digitado debe existir en la lista de activos
+    const roleExists = rolesActivos.some(r => r.nombre === formData.role.trim());
+    if (!roleExists) {
+      setErrors({ role: true, roleMsg: 'Seleccione un rol válido de la lista' });
       return;
     }
 
@@ -119,19 +143,25 @@ export const UserModal = ({ isOpen, onClose, mode, userData, onSave }) => {
               <label>
                 Rol del Sistema {!isViewOnly && <span className="required-asterisk">*</span>}
               </label>
-              <select 
+              
+              <input 
+                type="text"
                 name="role"
+                list="dynamic-roles"
                 value={formData.role}
                 onChange={handleChange}
                 disabled={isViewOnly}
-                className={errors.role ? 'input-error' : ''}
-              >
-                <option value="">Seleccione un rol...</option>
-                <option value="Administrador">Administrador</option>
-                <option value="Vendedor">Vendedor</option>
-                <option value="Domiciliario">Domiciliario</option>
-              </select>
-              {errors.role && <span className="error-text">Debe seleccionar un rol.</span>}
+                placeholder="Busca y selecciona un rol..."
+                autoComplete="off"
+                className={`autocomplete-input ${errors.role ? 'input-error' : ''}`}
+              />
+              <datalist id="dynamic-roles">
+                {rolesActivos.map(rol => (
+                  <option key={rol.id} value={rol.nombre} />
+                ))}
+              </datalist>
+              
+              {errors.role && <span className="error-text">{errors.roleMsg || 'Debe seleccionar un rol.'}</span>}
             </div>
 
             {(!isViewOnly && (mode === 'create' || mode === 'edit')) && (

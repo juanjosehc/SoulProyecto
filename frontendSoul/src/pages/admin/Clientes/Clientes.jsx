@@ -178,7 +178,7 @@ export const Clientes = () => {
                   </td>
                   <td className="client-email">{client.correo || '—'}</td>
                   <td>{client.telefono || '—'}</td>
-                  <td className="client-address">{client.direccion || '—'}</td>
+                  <td className="address-cell" title={client.direccion}>{client.direccion || '—'}</td>
                   <td>
                     <span className={`status-badge ${client.estado ? 'active' : 'inactive'}`}>
                       {client.estado ? 'Activo' : 'Inactivo'}
