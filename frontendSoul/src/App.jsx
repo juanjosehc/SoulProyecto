@@ -2,7 +2,8 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 // Importación de Auth y Vistas de Cliente
 import { Login } from './pages/auth/Login'; 
-import { Catalogo } from './pages/client/Catalogo/Catalogo'; // <-- NUEVO: Importamos el catálogo
+import { ResetPassword } from './pages/auth/ResetPassword';
+import { Catalogo } from './pages/client/Catalogo/Catalogo';
 
 // Importación de Layout y Vistas de Admin
 import { AdminLayout } from './layouts/AdminLayout';
@@ -27,7 +28,8 @@ function App() {
         
         {/* RUTAS PÚBLICAS */}
         <Route path="/login" element={<Login />} />
-        <Route path="/catalogo" element={<Catalogo />} /> {/* <-- NUEVO: Ruta del catálogo */}
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/catalogo" element={<Catalogo />} />
 
         {/* RUTAS PRIVADAS (Panel de Administración) */}
         <Route path="/admin" element={<AdminLayout />}>

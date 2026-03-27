@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { ShoppingCart, Plus, Eye, Trash2, X, Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ShoppingCart, Plus, Eye, Trash2, X, Search, ChevronLeft, ChevronRight, FileText } from 'lucide-react';
 import { PurchaseModal } from './components/PurchaseModal';
+import { generateRecordPDF } from '../../../utils/pdfGenerator';
 import './Compras.css';
 
 export const Compras = () => {
@@ -102,6 +103,34 @@ export const Compras = () => {
     return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(value);
   };
 
+  const handleGeneratePDF = (purchase) => {
+    const metaInfo = [
+      { label: 'Referencia', value: `#${purchase.id}` },
+      { label: 'Fecha de Registro', value: purchase.date },
+      { label: 'Proveedor', value: purchase.supplier },
+      { label: 'Estado', value: purchase.status },
+      { label: 'Artículos Totales', value: `${purchase.itemsCount} unidades` }
+    ];
+
+    const columns = ['Producto', 'Talla', 'Cantidad', 'Costo Unit.', 'Subtotal'];
+    const rows = purchase.items?.map(item => [
+      item.product,
+      item.talla || item.size,
+      item.cantidad || item.quantity,
+      formatCurrency(item.valorUnitario || item.unitCost),
+      formatCurrency(item.total || (item.cantidad * item.valorUnitario))
+    ]) || [];
+
+    generateRecordPDF(
+      `Orden de Compra #${purchase.id}`,
+      metaInfo,
+      columns,
+      rows,
+      purchase.total,
+      `Compra_SOUL_${purchase.id}.pdf`
+    );
+  };
+
   return (
     <div className="purchases-module">
       <header className="purchases-header">
@@ -154,6 +183,7 @@ export const Compras = () => {
                   <td>
                     <div className="action-buttons">
                       <button className="btn-action" title="Ver detalle" onClick={() => handleOpenView(purchase)}><Eye size={18} /></button>
+                      <button className="btn-action" title="Descargar PDF" onClick={() => handleGeneratePDF(purchase)}><FileText size={18} /></button>
                       
                       {purchase.status !== 'Anulada' && (
                         <button className="btn-action btn-delete" title="Anular Compra" onClick={() => handleOpenDelete(purchase)}><Trash2 size={18} /></button>

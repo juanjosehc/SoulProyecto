@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { TrendingUp, Plus, Eye, Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { TrendingUp, Plus, Eye, Search, ChevronLeft, ChevronRight, FileText } from 'lucide-react';
 import { SaleModal } from './components/SaleModal';
 import { formatCOP } from '../../../utils/currency';
+import { generateRecordPDF } from '../../../utils/pdfGenerator';
 import './Ventas.css';
 
 const API = 'http://localhost:3000/api';
@@ -99,6 +100,34 @@ export const Ventas = () => {
     }
   };
 
+  const handleGeneratePDF = (sale) => {
+    const metaInfo = [
+      { label: 'Factura / Código', value: sale.code },
+      { label: 'Fecha Venta', value: sale.saleDate },
+      { label: 'Cliente', value: sale.clientName },
+      { label: 'Estado', value: sale.status },
+      { label: 'Origen', value: sale.origin || 'Manual' }
+    ];
+
+    const columns = ['Producto', 'Talla', 'Cantidad', 'Precio Unit.', 'Subtotal'];
+    const rows = sale.items?.map(item => [
+      item.product,
+      item.talla,
+      item.cantidad,
+      formatCOP(item.valorUnitario),
+      formatCOP(item.total)
+    ]) || [];
+
+    generateRecordPDF(
+      `Detalle de Venta ${sale.code}`,
+      metaInfo,
+      columns,
+      rows,
+      sale.total,
+      `Venta_SOUL_${sale.code}.pdf`
+    );
+  };
+
   return (
     <div className="sales-module">
       <header className="sales-header">
@@ -155,6 +184,9 @@ export const Ventas = () => {
                     <div className="action-buttons">
                       <button className="btn-action" title="Ver detalle" onClick={() => handleOpenView(sale)}>
                         <Eye size={18} />
+                      </button>
+                      <button className="btn-action" title="Descargar PDF" onClick={() => handleGeneratePDF(sale)}>
+                        <FileText size={18} />
                       </button>
                       {sale.status !== 'Anulada' && (
                         <button className="btn-action btn-delete" title="Anular venta" onClick={() => handleAnular(sale.id)}>

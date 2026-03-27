@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Box, Plus, Edit2, Eye, Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Box, Plus, Edit2, Eye, Search, ChevronLeft, ChevronRight, FileText } from 'lucide-react';
 import { OrderModal } from './components/OrderModal';
 import { formatCOP } from '../../../utils/currency';
+import { generateRecordPDF } from '../../../utils/pdfGenerator';
 import './Pedidos.css';
 
 const API = 'http://localhost:3000/api';
@@ -107,6 +108,35 @@ export const Pedidos = () => {
     }
   };
 
+  const handleGeneratePDF = (order) => {
+    const metaInfo = [
+      { label: 'Código', value: order.code },
+      { label: 'Fecha Solicitud', value: order.orderDate },
+      { label: 'Fecha Entrega', value: order.deliveryDate },
+      { label: 'Cliente', value: order.clientName },
+      { label: 'Estado', value: order.orderStatus },
+      { label: 'Metodo de Pago', value: order.paymentMethod }
+    ];
+
+    const columns = ['Producto', 'Talla', 'Cantidad', 'Precio Unit.', 'Subtotal'];
+    const rows = order.items?.map(item => [
+      item.product,
+      item.talla,
+      item.cantidad,
+      formatCOP(item.valorUnitario),
+      formatCOP(item.total)
+    ]) || [];
+
+    generateRecordPDF(
+      `Detalle de Pedido ${order.code}`,
+      metaInfo,
+      columns,
+      rows,
+      order.total,
+      `Pedido_SOUL_${order.code}.pdf`
+    );
+  };
+
   return (
     <div className="orders-module">
       <header className="orders-header">
@@ -172,6 +202,9 @@ export const Pedidos = () => {
                     <div className="action-buttons">
                       <button className="btn-action" title="Ver detalle" onClick={() => handleOpenView(order)}>
                         <Eye size={18} />
+                      </button>
+                      <button className="btn-action" title="Descargar PDF" onClick={() => handleGeneratePDF(order)}>
+                        <FileText size={18} />
                       </button>
                       {order.orderStatus !== 'Completado' && order.orderStatus !== 'Anulado' && (
                         <button className="btn-action" title="Editar" onClick={() => handleOpenEdit(order)}>
