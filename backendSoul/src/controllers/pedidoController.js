@@ -7,6 +7,8 @@ const obtenerPedidos = async (req, res) => {
       SELECT 
         p.id,
         p.codigo_pedido as code,
+        p.cliente_id as "clienteId",
+        p.usuario_id as "usuarioId",
         p.nombre_cliente as "clientName",
         p.telefono as phone,
         p.direccion_entrega as "deliveryAddress",
@@ -15,6 +17,7 @@ const obtenerPedidos = async (req, res) => {
         p.estado as "orderStatus",
         p.total,
         p.created_at,
+        u.nombre as "domiciliarioName",
         COALESCE(
           (SELECT json_agg(
             json_build_object(
@@ -31,6 +34,7 @@ const obtenerPedidos = async (req, res) => {
         ) as items,
         (SELECT COALESCE(SUM(dp2.cantidad), 0) FROM detalle_pedidos dp2 WHERE dp2.pedido_id = p.id) as "itemsCount"
       FROM pedidos p
+      LEFT JOIN usuarios u ON p.usuario_id = u.id
       ORDER BY p.id DESC
     `);
     res.json(result.rows);
@@ -43,7 +47,7 @@ const obtenerPedidos = async (req, res) => {
 const crearPedido = async (req, res) => {
   const cliente = await pool.connect();
   try {
-    const { clientName, phone, deliveryDate, deliveryAddress, observations, items, total } = req.body;
+    const { clientName, phone, deliveryDate, deliveryAddress, observations, items, total, clienteId, usuarioId } = req.body;
     
     await cliente.query('BEGIN');
 
@@ -52,17 +56,11 @@ const crearPedido = async (req, res) => {
     const nextNum = parseInt(countResult.rows[0].count) + 1;
     const codigoPedido = `PED${String(nextNum).padStart(4, '0')}`;
 
-    // Buscar cliente si existe
-    let clienteId = null;
-    if (req.body.clienteId) {
-      clienteId = req.body.clienteId;
-    }
-
-    // Insertar pedido
+    // Insertar pedido con cliente_id y usuario_id (domiciliario)
     const pedidoResult = await cliente.query(
-      `INSERT INTO pedidos (codigo_pedido, cliente_id, nombre_cliente, telefono, direccion_entrega, fecha_entrega, observaciones, estado, total)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, 'Pendiente', $8) RETURNING id`,
-      [codigoPedido, clienteId, clientName, phone, deliveryAddress, deliveryDate || new Date(), observations || '', total || 0]
+      `INSERT INTO pedidos (codigo_pedido, cliente_id, usuario_id, nombre_cliente, telefono, direccion_entrega, fecha_entrega, observaciones, estado, total)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'Pendiente', $9) RETURNING id`,
+      [codigoPedido, clienteId || null, usuarioId || null, clientName, phone, deliveryAddress, deliveryDate || new Date(), observations || '', total || 0]
     );
     const pedidoId = pedidoResult.rows[0].id;
 
@@ -94,7 +92,7 @@ const editarPedido = async (req, res) => {
   const cliente = await pool.connect();
   try {
     const { id } = req.params;
-    const { clientName, phone, deliveryDate, deliveryAddress, observations, items, total } = req.body;
+    const { clientName, phone, deliveryDate, deliveryAddress, observations, items, total, clienteId, usuarioId } = req.body;
 
     await cliente.query('BEGIN');
 
@@ -105,10 +103,10 @@ const editarPedido = async (req, res) => {
       throw new Error('No se puede editar un pedido completado o anulado');
     }
 
-    // Actualizar pedido principal
+    // Actualizar pedido principal incluyendo cliente_id y usuario_id
     await cliente.query(
-      `UPDATE pedidos SET nombre_cliente = $1, telefono = $2, direccion_entrega = $3, fecha_entrega = $4, observaciones = $5, total = $6 WHERE id = $7`,
-      [clientName, phone, deliveryAddress, deliveryDate, observations, total, id]
+      `UPDATE pedidos SET cliente_id = $1, usuario_id = $2, nombre_cliente = $3, telefono = $4, direccion_entrega = $5, fecha_entrega = $6, observaciones = $7, total = $8 WHERE id = $9`,
+      [clienteId || null, usuarioId || null, clientName, phone, deliveryAddress, deliveryDate, observations, total, id]
     );
 
     // Borrar detalles y reinsertar

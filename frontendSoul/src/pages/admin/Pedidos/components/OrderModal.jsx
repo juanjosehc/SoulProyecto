@@ -9,7 +9,8 @@ const API = 'http://localhost:3000/api';
 
 export const OrderModal = ({ isOpen, onClose, mode, orderData, onSave }) => {
   const [formData, setFormData] = useState({
-    clientName: '', phone: '', deliveryDate: '', deliveryAddress: '', observations: '', orderStatus: 'Pendiente'
+    clientName: '', phone: '', deliveryDate: '', deliveryAddress: '', observations: '', orderStatus: 'Pendiente',
+    clienteId: null, usuarioId: null, domiciliarioName: ''
   });
 
   const [cart, setCart] = useState([]);
@@ -29,11 +30,13 @@ export const OrderModal = ({ isOpen, onClose, mode, orderData, onSave }) => {
       setFormData({
         clientName: orderData.clientName || '', phone: orderData.phone || '', 
         deliveryDate: orderData.deliveryDate || '', deliveryAddress: orderData.deliveryAddress || '', 
-        observations: orderData.observations || '', orderStatus: orderData.orderStatus || 'Pendiente'
+        observations: orderData.observations || '', orderStatus: orderData.orderStatus || 'Pendiente',
+        clienteId: orderData.clienteId || null, usuarioId: orderData.usuarioId || null,
+        domiciliarioName: orderData.domiciliarioName || ''
       });
       setCart(orderData.items || []); setErrors({});
     } else if (isOpen && mode === 'create') {
-      setFormData({ clientName: '', phone: '', deliveryDate: '', deliveryAddress: '', observations: '', orderStatus: 'Pendiente' });
+      setFormData({ clientName: '', phone: '', deliveryDate: '', deliveryAddress: '', observations: '', orderStatus: 'Pendiente', clienteId: null, usuarioId: null, domiciliarioName: '' });
       setCart([]); setCurrentProduct(''); setCurrentCantidad(1); setCurrentValor('');
       setTallasDisponibles([]); setStockActual(0); setStockError(''); setErrors({});
     }
@@ -45,6 +48,7 @@ export const OrderModal = ({ isOpen, onClose, mode, orderData, onSave }) => {
   const title = mode === 'create' ? 'Registrar Pedido' : mode === 'edit' ? 'Editar Pedido' : 'Detalle del Pedido';
   const buttonText = mode === 'create' ? 'Crear Pedido' : 'Guardar Cambios';
 
+  // === PRODUCTO AUTOCOMPLETE ===
   const handleProductSelect = (item) => {
     setCurrentProduct(item.name);
     const detalle = item.sizesDetail || [];
@@ -60,6 +64,27 @@ export const OrderModal = ({ isOpen, onClose, mode, orderData, onSave }) => {
     const found = tallasDisponibles.find(t => t.talla === talla);
     setStockActual(found?.stock || 0);
     setStockError('');
+  };
+
+  // === CLIENTE AUTOCOMPLETE ===
+  const handleClienteSelect = (item) => {
+    const nombreCompleto = `${item.nombres} ${item.apellidos || ''}`.trim();
+    setFormData(prev => ({
+      ...prev,
+      clientName: nombreCompleto,
+      phone: item.telefono || prev.phone,
+      clienteId: item.id
+    }));
+    if (errors.clientName) setErrors(prev => ({ ...prev, clientName: false }));
+  };
+
+  // === DOMICILIARIO AUTOCOMPLETE ===
+  const handleDomiciliarioSelect = (item) => {
+    setFormData(prev => ({
+      ...prev,
+      domiciliarioName: item.name,
+      usuarioId: item.id
+    }));
   };
 
   const handleAddToCart = () => {
@@ -134,8 +159,23 @@ export const OrderModal = ({ isOpen, onClose, mode, orderData, onSave }) => {
             <div className="form-group-stack">
               <div className="input-group">
                 <label>Cliente <span className="required-asterisk">*</span></label>
-                <input type="text" name="clientName" value={formData.clientName} onChange={handleChange} disabled={isViewOnly} placeholder="Nombre completo" className={errors.clientName ? 'input-error' : ''} />
-                {errors.clientName && <span className="error-text">El nombre es obligatorio.</span>}
+                {isViewOnly ? (
+                  <input type="text" value={formData.clientName} disabled placeholder="Nombre completo" />
+                ) : (
+                  <AutocompleteInput
+                    value={formData.clientName}
+                    onChange={(val) => {
+                      setFormData(prev => ({ ...prev, clientName: val, clienteId: null }));
+                      if (errors.clientName) setErrors(prev => ({ ...prev, clientName: false }));
+                    }}
+                    fetchUrl={`${API}/clientes/search`}
+                    placeholder="Buscar cliente..."
+                    displayKey="nombres"
+                    onSelect={handleClienteSelect}
+                    className={errors.clientName ? 'input-error' : ''}
+                  />
+                )}
+                {errors.clientName && <span className="error-text">El cliente es obligatorio.</span>}
               </div>
               <div className="input-group">
                 <label>Teléfono <span className="required-asterisk">*</span></label>
@@ -154,6 +194,23 @@ export const OrderModal = ({ isOpen, onClose, mode, orderData, onSave }) => {
                 <input type="text" name="deliveryAddress" value={formData.deliveryAddress} onChange={handleChange} disabled={isViewOnly} placeholder="Ej: Calle 123 #45-67" className={`date-input ${errors.deliveryAddress ? 'input-error' : ''}`} />
                 {errors.deliveryAddress && <span className="error-text">La dirección es obligatoria.</span>}
               </div>
+            </div>
+            <div className="input-group" style={{marginTop: '12px'}}>
+              <label>Domiciliario</label>
+              {isViewOnly ? (
+                <input type="text" value={formData.domiciliarioName || 'Sin asignar'} disabled />
+              ) : (
+                <AutocompleteInput
+                  value={formData.domiciliarioName}
+                  onChange={(val) => {
+                    setFormData(prev => ({ ...prev, domiciliarioName: val, usuarioId: null }));
+                  }}
+                  fetchUrl={`${API}/usuarios/search/domiciliarios`}
+                  placeholder="Buscar domiciliario..."
+                  displayKey="name"
+                  onSelect={handleDomiciliarioSelect}
+                />
+              )}
             </div>
             <div className="input-group" style={{marginTop: '12px'}}>
               <label>Observaciones</label>

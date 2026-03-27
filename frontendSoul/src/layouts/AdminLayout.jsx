@@ -1,4 +1,4 @@
-import { Outlet, NavLink, useNavigate, Navigate } from 'react-router-dom';
+import { Outlet, NavLink, useNavigate, Navigate, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, Shield, Users, Package, PackageSearch, 
   Store, ShoppingCart, User, Box, TrendingUp, Calendar, LogOut 
@@ -22,6 +22,7 @@ const sidebarItems = [
 
 export const AdminLayout = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Verificar autenticación
   const token = localStorage.getItem('token');
@@ -43,18 +44,27 @@ export const AdminLayout = () => {
     return <Navigate to="/catalogo" replace />;
   }
 
-  // Obtener permisos del usuario (asegurar que sea un array válido)
-  let permisos = [];
+  // Obtener permisos del usuario y normalizar a minúsculas para comparación
+  let permisosNormalizados = [];
   if (Array.isArray(user.permisos) && user.permisos.length > 0) {
-    permisos = user.permisos;
+    permisosNormalizados = user.permisos.map(p => p.toLowerCase());
   }
 
-  // Filtrar sidebar según permisos del usuario
-  // Si el array de permisos está vacío (rol sin permisos configurados), mostrar TODOS
-  // Esto previene que un admin con rol existente antes de la migración se quede sin acceso
-  const itemsVisibles = permisos.length > 0
-    ? sidebarItems.filter(item => permisos.includes(item.permiso))
-    : sidebarItems; // Mostrar todo si no hay permisos configurados (backwards compatibility)
+  // Filtrar sidebar según permisos del usuario (comparación case-insensitive)
+  const itemsVisibles = permisosNormalizados.length > 0
+    ? sidebarItems.filter(item => permisosNormalizados.includes(item.permiso.toLowerCase()))
+    : sidebarItems;
+
+  // Protección de ruta: verificar que la ruta actual está permitida
+  const currentPath = location.pathname;
+  if (permisosNormalizados.length > 0 && currentPath !== '/admin') {
+    const currentItem = sidebarItems.find(item => currentPath.startsWith(item.path));
+    if (currentItem && !permisosNormalizados.includes(currentItem.permiso.toLowerCase())) {
+      // Redirigir al primer módulo permitido
+      const primerPermitido = itemsVisibles[0]?.path || '/login';
+      return <Navigate to={primerPermitido} replace />;
+    }
+  }
 
   const navClass = ({ isActive }) => `nav-item ${isActive ? 'active' : ''}`;
 

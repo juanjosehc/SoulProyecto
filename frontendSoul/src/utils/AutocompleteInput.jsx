@@ -30,7 +30,10 @@ export const AutocompleteInput = ({ value, onChange, fetchUrl, placeholder, disa
       debounceRef.current = setTimeout(async () => {
         setLoading(true);
         try {
-          const res = await fetch(`${fetchUrl}?q=${encodeURIComponent(val)}`);
+          const token = localStorage.getItem('token');
+          const res = await fetch(`${fetchUrl}?q=${encodeURIComponent(val)}`, {
+            headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+          });
           const data = await res.json();
           if (Array.isArray(data)) {
             setSuggestions(data);
@@ -70,7 +73,9 @@ export const AutocompleteInput = ({ value, onChange, fetchUrl, placeholder, disa
     if (value && value.trim().length >= 1) {
       setLoading(true);
       try {
-        const res = await fetch(`${fetchUrl}?q=${encodeURIComponent(value)}`);
+        const token = localStorage.getItem('token');
+        const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+        const res = await fetch(`${fetchUrl}?q=${encodeURIComponent(value)}`, { headers });
         const data = await res.json();
         if (Array.isArray(data)) {
           setSuggestions(data);
@@ -84,7 +89,9 @@ export const AutocompleteInput = ({ value, onChange, fetchUrl, placeholder, disa
     } else {
       // Cargar todos si no hay texto
       try {
-        const res = await fetch(`${fetchUrl}?q=`);
+        const token = localStorage.getItem('token');
+        const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+        const res = await fetch(`${fetchUrl}?q=`, { headers });
         const data = await res.json();
         if (Array.isArray(data)) {
           setSuggestions(data);

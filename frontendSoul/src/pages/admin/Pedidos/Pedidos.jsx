@@ -18,7 +18,10 @@ export const Pedidos = () => {
 
   const cargarPedidos = async () => {
     try {
-      const res = await fetch(`${API}/pedidos`);
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API}/pedidos`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
       const data = await res.json();
       if (Array.isArray(data)) setOrders(data);
     } catch (error) {
@@ -33,10 +36,11 @@ export const Pedidos = () => {
       const isEditing = orderData.id != null;
       const url = isEditing ? `${API}/pedidos/${orderData.id}` : `${API}/pedidos`;
       const method = isEditing ? 'PUT' : 'POST';
+      const token = localStorage.getItem('token');
 
       const res = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify(orderData)
       });
 
@@ -55,9 +59,10 @@ export const Pedidos = () => {
 
   const handleChangeStatus = async (orderId, newStatus) => {
     try {
+      const token = localStorage.getItem('token');
       const res = await fetch(`${API}/pedidos/${orderId}/estado`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ estado: newStatus })
       });
 

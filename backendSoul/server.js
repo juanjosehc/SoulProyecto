@@ -2,6 +2,9 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 
+// Importar middleware de autenticación
+const { verificarToken, verificarPermiso } = require('./src/middleware/authMiddleware');
+
 // Importar rutas
 const authRoutes = require('./src/routes/authRoutes');
 const categoriaRoutes = require('./src/routes/categoriaRoutes');
@@ -22,19 +25,26 @@ const app = express();
 app.use(cors()); // Permite que tu frontend de React haga peticiones aquí
 app.use(express.json({ limit: '50mb' })); // Permite recibir datos en formato JSON (aumentado para imágenes)
 
-// Usar Rutas
+// === RUTAS PÚBLICAS (sin autenticación) ===
 app.use('/api/auth', authRoutes);
-app.use('/api/categorias', categoriaRoutes);
+
+// Productos: rutas públicas (/active y /search) se manejan ANTES del middleware
+// Las rutas que necesitan permisos se protegen dentro del archivo de rutas
 app.use('/api/productos', productoRoutes);
-app.use('/api/usuarios', usuarioRoutes);
-app.use('/api/roles', rolRoutes);
-app.use('/api/proveedores', proveedorRoutes);
-app.use('/api/compras', compraRoutes);
-app.use('/api/clientes', clienteRoutes);
-app.use('/api/pedidos', pedidoRoutes);
-app.use('/api/ventas', ventaRoutes);
-app.use('/api/entregas', entregaRoutes);
-app.use('/api/dashboard', dashboardRoutes);
+
+// Categorías: públicas para que el catálogo pueda cargar los filtros
+app.use('/api/categorias', categoriaRoutes);
+
+// === RUTAS PROTEGIDAS (requieren autenticación + permisos) ===
+app.use('/api/usuarios', verificarToken, usuarioRoutes);
+app.use('/api/roles', verificarToken, verificarPermiso('roles'), rolRoutes);
+app.use('/api/proveedores', verificarToken, verificarPermiso('proveedores'), proveedorRoutes);
+app.use('/api/compras', verificarToken, verificarPermiso('compras'), compraRoutes);
+app.use('/api/clientes', verificarToken, clienteRoutes);
+app.use('/api/pedidos', verificarToken, verificarPermiso('pedidos'), pedidoRoutes);
+app.use('/api/ventas', verificarToken, verificarPermiso('ventas'), ventaRoutes);
+app.use('/api/entregas', verificarToken, verificarPermiso('entregas'), entregaRoutes);
+app.use('/api/dashboard', verificarToken, verificarPermiso('dashboard'), dashboardRoutes);
 
 // Iniciar servidor
 const PORT = process.env.PORT || 3000;

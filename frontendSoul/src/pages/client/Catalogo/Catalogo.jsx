@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { ShoppingBag, X, Plus, Minus, Trash2, ArrowLeft, ChevronDown, CheckCircle2, Search } from 'lucide-react';
+import { ShoppingBag, X, Plus, Minus, Trash2, ArrowLeft, ChevronDown, CheckCircle2, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import './Catalogo.css';
 
@@ -35,6 +35,11 @@ export const Catalogo = () => {
   const [checkoutForm, setCheckoutForm] = useState({ phone: '', address: '', observations: '' });
   const [checkoutErrors, setCheckoutErrors] = useState({});
   const [orderSuccess, setOrderSuccess] = useState(false);
+
+  // Galería de imágenes
+  const [galleryOpen, setGalleryOpen] = useState(false);
+  const [galleryImages, setGalleryImages] = useState([]);
+  const [galleryIndex, setGalleryIndex] = useState(0);
 
   // Toast
   const [toast, setToast] = useState('');
@@ -110,6 +115,35 @@ export const Catalogo = () => {
   const showToast = (msg) => {
     setToast(msg);
     setTimeout(() => setToast(''), 2500);
+  };
+
+  // Galería de imágenes
+  const openGallery = (product) => {
+    let imgs = [];
+    if (Array.isArray(product.images)) {
+      imgs = product.images.filter(img => img && img !== 'null');
+    }
+    if (imgs.length === 0 && product.image) {
+      imgs = [product.image];
+    }
+    if (imgs.length === 0) return;
+    setGalleryImages(imgs);
+    setGalleryIndex(0);
+    setGalleryOpen(true);
+  };
+
+  const closeGallery = () => {
+    setGalleryOpen(false);
+    setGalleryImages([]);
+    setGalleryIndex(0);
+  };
+
+  const galleryPrev = () => {
+    setGalleryIndex(prev => (prev === 0 ? galleryImages.length - 1 : prev - 1));
+  };
+
+  const galleryNext = () => {
+    setGalleryIndex(prev => (prev === galleryImages.length - 1 ? 0 : prev + 1));
   };
 
   // Carrito
@@ -325,9 +359,12 @@ export const Catalogo = () => {
                 const availableSizes = getAvailableSizes(product);
                 return (
                   <div key={product.id} className="product-card">
-                    <div className="product-image-container">
+                    <div className="product-image-container" onClick={() => openGallery(product)} style={{cursor: 'pointer'}}>
                       <img src={getMainImage(product)} alt={product.name} />
                       <span className="product-category-tag">{product.category}</span>
+                      {Array.isArray(product.images) && product.images.length > 1 && (
+                        <span className="product-gallery-hint">{product.images.length} fotos</span>
+                      )}
                     </div>
                     <div className="product-info">
                       <h3 className="product-name">{product.name}</h3>
@@ -367,6 +404,46 @@ export const Catalogo = () => {
           </div>
         </div>
       </section>
+
+      {/* MODAL GALERÍA DE IMÁGENES */}
+      {galleryOpen && (
+        <div className="gallery-overlay" onClick={closeGallery}>
+          <div className="gallery-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="gallery-close" onClick={closeGallery}>
+              <X size={24} />
+            </button>
+            <div className="gallery-content">
+              {galleryImages.length > 1 && (
+                <button className="gallery-nav gallery-prev" onClick={galleryPrev}>
+                  <ChevronLeft size={32} />
+                </button>
+              )}
+              <img
+                src={galleryImages[galleryIndex]}
+                alt={`Imagen ${galleryIndex + 1}`}
+                className="gallery-image"
+              />
+              {galleryImages.length > 1 && (
+                <button className="gallery-nav gallery-next" onClick={galleryNext}>
+                  <ChevronRight size={32} />
+                </button>
+              )}
+            </div>
+            {galleryImages.length > 1 && (
+              <div className="gallery-dots">
+                {galleryImages.map((_, i) => (
+                  <button
+                    key={i}
+                    className={`gallery-dot ${i === galleryIndex ? 'active' : ''}`}
+                    onClick={() => setGalleryIndex(i)}
+                  />
+                ))}
+              </div>
+            )}
+            <p className="gallery-counter">{galleryIndex + 1} / {galleryImages.length}</p>
+          </div>
+        </div>
+      )}
 
       {/* OVERLAY CARRITO */}
       <div className={`cart-overlay ${isCartOpen ? 'open' : ''}`} onClick={() => setIsCartOpen(false)} />

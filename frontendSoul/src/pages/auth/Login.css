@@ -273,3 +273,36 @@
 .btn-catalog-link:active {
   transform: scale(0.98);
 }
+
+/* --- BOTÓN VOLVER AL LOGIN --- */
+.btn-back-auth {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: #C9A24D;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 20px;
+  transition: opacity 0.2s ease;
+}
+
+.btn-back-auth:hover {
+  opacity: 0.75;
+}
+
+/* --- MENSAJE DE ÉXITO --- */
+.login-success {
+  background-color: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  color: #22c55e;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+  text-align: center;
+  animation: fadeIn 0.3s ease;
+}

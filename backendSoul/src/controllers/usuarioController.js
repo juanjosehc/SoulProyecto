@@ -116,6 +116,25 @@ const eliminarUsuario = async (req, res) => {
   }
 };
 
+// 6. Buscar domiciliarios activos (autocomplete)
+const buscarDomiciliarios = async (req, res) => {
+  try {
+    const { q } = req.query;
+    const result = await pool.query(
+      `SELECT u.id, u.nombre as name, u.email
+       FROM usuarios u
+       JOIN roles r ON u.rol_id = r.id
+       WHERE r.nombre = 'Domiciliario' AND u.is_active = true AND r.is_active = true
+       AND u.nombre ILIKE $1
+       ORDER BY u.nombre LIMIT 20`,
+      [`%${q || ''}%`]
+    );
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
-  obtenerUsuarios, crearUsuario, editarUsuario, cambiarEstadoUsuario, eliminarUsuario
+  obtenerUsuarios, crearUsuario, editarUsuario, cambiarEstadoUsuario, eliminarUsuario, buscarDomiciliarios
 };
