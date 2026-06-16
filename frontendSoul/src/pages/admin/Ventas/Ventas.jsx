@@ -15,6 +15,9 @@ export const Ventas = () => {
 
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [filtroFecha, setFiltroFecha] = useState('');
+  const [filtroDomiciliario, setFiltroDomiciliario] = useState('');
+  const [domiciliarios, setDomiciliarios] = useState([]);
   const itemsPerPage = 8;
 
   const cargarVentas = async () => {
@@ -28,6 +31,19 @@ export const Ventas = () => {
   };
 
   useEffect(() => { cargarVentas(); }, []);
+
+  useEffect(() => {
+    const fetchDomiciliarios = async () => {
+      try {
+        const res = await fetch(`${API}/usuarios/search/domiciliarios?q=`);
+        const data = await res.json();
+        if (Array.isArray(data)) setDomiciliarios(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchDomiciliarios();
+  }, []);
 
   const handleSaveSale = async (saleData) => {
     try {
@@ -73,12 +89,16 @@ export const Ventas = () => {
 
   const filteredSales = sales.filter(sale => {
     const term = searchTerm.toLowerCase();
-    return (
+    const matchSearch = (
       sale.clientName?.toLowerCase().includes(term) ||
       sale.code?.toLowerCase().includes(term) ||
       sale.status?.toLowerCase().includes(term) ||
       sale.origin?.toLowerCase().includes(term)
     );
+    const matchFecha = !filtroFecha || sale.saleDate === filtroFecha;
+    const matchDomiciliario = !filtroDomiciliario || sale.domiciliarioName === filtroDomiciliario;
+
+    return matchSearch && matchFecha && matchDomiciliario;
   });
 
   const totalPages = Math.ceil(filteredSales.length / itemsPerPage) || 1;
@@ -138,11 +158,34 @@ export const Ventas = () => {
             <p>Registro de ventas manuales y automáticas del sistema</p>
           </div>
         </div>
-        <div className="header-actions">
+        <div className="header-actions" style={{ flexWrap: 'wrap' }}>
           <div className="search-container">
             <Search size={18} className="search-icon" />
             <input type="text" placeholder="Buscar por cliente o código..." value={searchTerm} onChange={handleSearch} className="search-input" />
           </div>
+          
+          <input 
+            type="date" 
+            value={filtroFecha} 
+            onChange={(e) => { setFiltroFecha(e.target.value); setCurrentPage(1); }} 
+            className="search-input" 
+            style={{ width: '150px', paddingLeft: '12px' }} 
+            title="Filtrar por Fecha"
+          />
+
+          <select 
+            value={filtroDomiciliario} 
+            onChange={(e) => { setFiltroDomiciliario(e.target.value); setCurrentPage(1); }} 
+            className="search-input" 
+            style={{ width: '180px', paddingLeft: '12px', cursor: 'pointer' }}
+            title="Filtrar por Domiciliario"
+          >
+            <option value="">Todos los domiciliarios</option>
+            {domiciliarios.map(dom => (
+              <option key={dom.id} value={dom.name}>{dom.name}</option>
+            ))}
+          </select>
+
           <button className="btn-primary" onClick={handleOpenCreate}>
             <Plus size={18} /> Registrar Venta
           </button>

@@ -168,6 +168,17 @@ export const SaleModal = ({ isOpen, onClose, mode, saleData, onSave }) => {
               <label>Observaciones</label>
               <textarea name="observations" value={formData.observations} onChange={handleChange} disabled={isViewOnly} placeholder="Detalles..." rows="3" className="textarea-field" />
             </div>
+            {isViewOnly && (
+              <div className="input-group" style={{marginTop: '12px'}}>
+                <label>Domiciliario que realizó la entrega</label>
+                <input 
+                  type="text" 
+                  value={saleData?.domiciliarioName || 'Sin domiciliario / Entrega en tienda'} 
+                  disabled 
+                  style={{ backgroundColor: '#18181b', border: '1px solid #27272a', color: '#a1a1aa', padding: '10px 12px', borderRadius: '6px', width: '100%', boxSizing: 'border-box' }}
+                />
+              </div>
+            )}
           </div>
 
           {/* PANEL DERECHO */}

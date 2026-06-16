@@ -5,7 +5,7 @@ import './RoleModal.css';
 
 const API = 'http://localhost:3000/api';
 
-export const RoleModal = ({ isOpen, onClose, mode, roleData, onSave }) => {
+export const RoleModal = ({ isOpen, onClose, mode, roleData, onSave, loading }) => {
   const [nombreRol, setNombreRol] = useState('');
   const [permisos, setPermisos] = useState([]); // Arreglo de IDs numéricos
   const [modulosDisponibles, setModulosDisponibles] = useState([]);
@@ -41,7 +41,7 @@ export const RoleModal = ({ isOpen, onClose, mode, roleData, onSave }) => {
   const buttonText = mode === 'create' ? 'Crear Rol' : 'Guardar Cambios';
 
   const handleCheckboxChange = (moduloId) => {
-    if (isViewOnly) return;
+    if (isViewOnly || loading) return;
     if (permisos.includes(moduloId)) {
       setPermisos(permisos.filter(p => p !== moduloId));
     } else {
@@ -72,7 +72,7 @@ export const RoleModal = ({ isOpen, onClose, mode, roleData, onSave }) => {
       <div className="modal-container">
         <div className="modal-header">
           <h2>{title}</h2>
-          <button className="btn-close" onClick={onClose} title="Cerrar">
+          <button className="btn-close" onClick={onClose} title="Cerrar" disabled={loading}>
             <X size={20} />
           </button>
         </div>
@@ -91,7 +91,7 @@ export const RoleModal = ({ isOpen, onClose, mode, roleData, onSave }) => {
                 setNombreRol(e.target.value);
                 if (error) setError(false); // Quitamos el error en cuanto el usuario empiece a escribir
               }}
-              disabled={isViewOnly}
+              disabled={isViewOnly || loading}
               placeholder="Ej: Administrador"
               className={error ? 'input-error' : ''} // Aplicamos la clase roja si hay error
             />
@@ -107,12 +107,12 @@ export const RoleModal = ({ isOpen, onClose, mode, roleData, onSave }) => {
               {modulosDisponibles.map((modulo) => {
                 const isChecked = permisos.includes(modulo.id);
                 return (
-                  <label key={modulo.id} className={`checkbox-label ${isChecked ? 'selected' : ''} ${isViewOnly ? 'disabled' : ''}`}>
+                  <label key={modulo.id} className={`checkbox-label ${isChecked ? 'selected' : ''} ${(isViewOnly || loading) ? 'disabled' : ''}`}>
                     <input 
                       type="checkbox" 
                       checked={isChecked}
                       onChange={() => handleCheckboxChange(modulo.id)}
-                      disabled={isViewOnly}
+                      disabled={isViewOnly || loading}
                     />
                     <span>{modulo.descripcion}</span>
                   </label>
@@ -124,9 +124,9 @@ export const RoleModal = ({ isOpen, onClose, mode, roleData, onSave }) => {
 
         {!isViewOnly && (
           <div className="modal-footer">
-            <button className="btn-secondary" onClick={onClose}>Cancelar</button>
-            <button className="btn-primary-modal" onClick={handleSubmit}>
-              {buttonText}
+            <button className="btn-secondary" onClick={onClose} disabled={loading}>Cancelar</button>
+            <button className="btn-primary-modal" onClick={handleSubmit} disabled={loading}>
+              {loading ? 'Guardando...' : buttonText}
             </button>
           </div>
         )}

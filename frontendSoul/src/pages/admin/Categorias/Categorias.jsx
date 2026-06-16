@@ -18,6 +18,8 @@ export const Categorias = () => {
   // Estados para modal de eliminación
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState(null);
+  const [deleteError, setDeleteError] = useState(''); // Error de llaves foráneas
+  const [loading, setLoading] = useState(false); // Para feedback de carga visual
 
   // ==========================================
   // CONEXIÓN CON EL BACKEND (PETICIONES HTTP)
@@ -51,56 +53,66 @@ export const Categorias = () => {
 
   // 2. CREAR Y EDITAR (POST / PUT)
   const handleSaveCategory = async (categoryDataFromModal) => {
+    setLoading(true);
     try {
-      // Preparamos los datos con los nombres que espera PostgreSQL
       const datosParaBackend = {
         nombre: categoryDataFromModal.name,
         descripcion: categoryDataFromModal.description
       };
 
+      let respuesta;
       if (modalMode === 'create') {
-        await fetch('http://localhost:3000/api/categorias', {
+        respuesta = await fetch('http://localhost:3000/api/categorias', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(datosParaBackend)
         });
       } else if (modalMode === 'edit') {
-        await fetch(`http://localhost:3000/api/categorias/${categoryDataFromModal.id}`, {
+        respuesta = await fetch(`http://localhost:3000/api/categorias/${categoryDataFromModal.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(datosParaBackend)
         });
       }
-      
-      // Recargamos la tabla y cerramos el modal
-      cargarCategorias();
-      handleCloseModal();
+
+      if (respuesta && !respuesta.ok) {
+        const errData = await respuesta.json();
+        alert(errData.error || 'Error al guardar la categoría');
+      } else {
+        cargarCategorias();
+        handleCloseModal();
+      }
     } catch (error) {
       console.error("Error al guardar la categoría:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   // 3. CAMBIAR ESTADO (PATCH)
   const toggleCategoryStatus = async (id) => {
-    // Buscamos la categoría actual para saber su estado e invertirlo
     const categoria = categories.find(c => c.id === id);
     if (!categoria) return;
 
+    setLoading(true);
     try {
       await fetch(`http://localhost:3000/api/categorias/${id}/estado`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ is_active: !categoria.isActive }) // Enviamos el estado invertido
+        body: JSON.stringify({ is_active: !categoria.isActive })
       });
-      
-      cargarCategorias(); // Recargamos la tabla para ver el cambio
+      cargarCategorias();
     } catch (error) {
       console.error("Error al cambiar estado:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   // 4. ELIMINAR (DELETE)
   const handleConfirmDelete = async () => {
+    setLoading(true);
+    setDeleteError('');
     try {
       const respuesta = await fetch(`http://localhost:3000/api/categorias/${categoryToDelete.id}`, {
         method: 'DELETE'
@@ -108,13 +120,17 @@ export const Categorias = () => {
       
       if (!respuesta.ok) {
         const error = await respuesta.json();
-        alert(error.error || "Error al eliminar"); // Si tiene productos, mostrará el error de llave foránea
+        // Captura del mensaje limpio enviado por el backend (error de llave foránea)
+        setDeleteError(error.error || "No se puede eliminar esta categoría.");
       } else {
         cargarCategorias();
+        handleCloseDelete();
       }
-      handleCloseDelete();
     } catch (error) {
       console.error("Error al eliminar:", error);
+      setDeleteError("Ocurrió un error al conectar con el servidor.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -125,8 +141,8 @@ export const Categorias = () => {
   const handleOpenEdit = (category) => { setModalMode('edit'); setSelectedCategory(category); setIsModalOpen(true); };
   const handleOpenView = (category) => { setModalMode('view'); setSelectedCategory(category); setIsModalOpen(true); };
   const handleCloseModal = () => { setIsModalOpen(false); setSelectedCategory(null); };
-  const handleOpenDelete = (category) => { setCategoryToDelete(category); setIsDeleteModalOpen(true); };
-  const handleCloseDelete = () => { setIsDeleteModalOpen(false); setCategoryToDelete(null); };
+  const handleOpenDelete = (category) => { setCategoryToDelete(category); setDeleteError(''); setIsDeleteModalOpen(true); };
+  const handleCloseDelete = () => { setIsDeleteModalOpen(false); setCategoryToDelete(null); setDeleteError(''); };
 
   // ==========================================
   // LÓGICA DE BÚSQUEDA Y PAGINACIÓN
@@ -261,6 +277,7 @@ export const Categorias = () => {
         mode={modalMode} 
         categoryData={selectedCategory} 
         onSave={handleSaveCategory}
+        loading={loading}
       />
 
       {isDeleteModalOpen && (
@@ -268,17 +285,24 @@ export const Categorias = () => {
           <div className="modal-container modal-small">
             <div className="modal-header">
               <h2>Confirmar Eliminación</h2>
-              <button className="btn-close" onClick={handleCloseDelete} title="Cerrar"><X size={20} /></button>
+              <button className="btn-close" onClick={handleCloseDelete} title="Cerrar" disabled={loading}><X size={20} /></button>
             </div>
             <div className="modal-body">
               <p style={{ color: '#e4e4e7', fontSize: '15px' }}>
                 ¿Estás seguro de que deseas eliminar la categoría <strong>"{categoryToDelete?.name}"</strong>? <br/><br/>
                 <span style={{ color: '#ef4444', fontSize: '13px' }}>Los productos asociados a esta categoría podrían verse afectados.</span>
               </p>
+              {deleteError && (
+                <div style={{ marginTop: '16px', padding: '10px', backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', borderRadius: '6px', color: '#ef4444', fontSize: '14px' }}>
+                  {deleteError}
+                </div>
+              )}
             </div>
             <div className="modal-footer">
-              <button className="btn-secondary" onClick={handleCloseDelete}>Cancelar</button>
-              <button className="btn-danger" onClick={handleConfirmDelete}>Sí, eliminar</button>
+              <button className="btn-secondary" onClick={handleCloseDelete} disabled={loading}>Cancelar</button>
+              <button className="btn-danger" onClick={handleConfirmDelete} disabled={loading}>
+                {loading ? 'Eliminando...' : 'Sí, eliminar'}
+              </button>
             </div>
           </div>
         </div>

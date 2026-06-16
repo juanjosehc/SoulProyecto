@@ -8,7 +8,7 @@ const API = 'http://localhost:3000/api';
 const metodosPago = ['Transferencia', 'Efectivo', 'Tarjeta de Crédito'];
 const tallasList = ['6', '6.5', '7', '7.5', '8', '8.5', '9', '9.5', '10', '10.5', '11'];
 
-export const PurchaseModal = ({ isOpen, onClose, mode, purchaseData, onSave }) => {
+export const PurchaseModal = ({ isOpen, onClose, mode, purchaseData, onSave, loading }) => {
   const [formData, setFormData] = useState({
     provider: '',
     date: new Date().toISOString().split('T')[0], 
@@ -22,6 +22,7 @@ export const PurchaseModal = ({ isOpen, onClose, mode, purchaseData, onSave }) =
   const [currentTalla, setCurrentTalla] = useState(tallasList[0]);
   const [currentCantidad, setCurrentCantidad] = useState(1);
   const [currentValor, setCurrentValor] = useState('');
+  const [currentPrecioVenta, setCurrentPrecioVenta] = useState('');
 
   const [errors, setErrors] = useState({});
 
@@ -44,6 +45,7 @@ export const PurchaseModal = ({ isOpen, onClose, mode, purchaseData, onSave }) =
       setCurrentProduct('');
       setCurrentCantidad(1);
       setCurrentValor('');
+      setCurrentPrecioVenta('');
       setErrors({});
     }
   }, [isOpen, mode, purchaseData]);
@@ -63,6 +65,7 @@ export const PurchaseModal = ({ isOpen, onClose, mode, purchaseData, onSave }) =
     if (!currentProduct) newErrors.cart = true;
     if (!currentCantidad || currentCantidad <= 0) newErrors.currentCantidad = true;
     if (!currentValor || currentValor <= 0) newErrors.currentValor = true;
+    if (!currentPrecioVenta || currentPrecioVenta <= 0) newErrors.currentPrecioVenta = true;
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -74,12 +77,14 @@ export const PurchaseModal = ({ isOpen, onClose, mode, purchaseData, onSave }) =
       talla: currentTalla,
       cantidad: Number(currentCantidad),
       valorUnitario: Number(currentValor),
+      precioVenta: Number(currentPrecioVenta),
       total: Number(currentCantidad) * Number(currentValor)
     };
 
     setCart([...cart, newItem]);
     setCurrentCantidad(1);
     setCurrentValor('');
+    setCurrentPrecioVenta('');
     setErrors({});
   };
 
@@ -114,7 +119,7 @@ export const PurchaseModal = ({ isOpen, onClose, mode, purchaseData, onSave }) =
       <div className="modal-container modal-large-purchase">
         <div className="modal-header">
           <h2>{title}</h2>
-          <button className="btn-close" onClick={onClose}><X size={20} /></button>
+          <button className="btn-close" onClick={onClose} disabled={loading}><X size={20} /></button>
         </div>
 
         <div className="modal-body">
@@ -130,17 +135,18 @@ export const PurchaseModal = ({ isOpen, onClose, mode, purchaseData, onSave }) =
                   fetchUrl={`${API}/proveedores/search`}
                   placeholder="Buscar proveedor..."
                   className={errors.provider ? 'input-error' : ''}
+                  disabled={loading}
                 />
               )}
               {errors.provider && <span className="error-text">Seleccione un proveedor.</span>}
             </div>
             <div className="input-group">
               <label>Fecha de Compra</label>
-              <input type="date" value={formData.date} onChange={(e) => setFormData({...formData, date: e.target.value})} disabled={isViewOnly} className="date-input" />
+              <input type="date" value={formData.date} onChange={(e) => setFormData({...formData, date: e.target.value})} disabled={isViewOnly || loading} className="date-input" />
             </div>
             <div className="input-group">
               <label>Método de Pago</label>
-              <select value={formData.paymentMethod} onChange={(e) => setFormData({...formData, paymentMethod: e.target.value})} disabled={isViewOnly} className="custom-select">
+              <select value={formData.paymentMethod} onChange={(e) => setFormData({...formData, paymentMethod: e.target.value})} disabled={isViewOnly || loading} className="custom-select">
                 {metodosPago.map(met => <option key={met} value={met}>{met}</option>)}
               </select>
             </div>
@@ -159,15 +165,16 @@ export const PurchaseModal = ({ isOpen, onClose, mode, purchaseData, onSave }) =
                   placeholder="Escribir nombre del producto..."
                   onSelect={(item) => {
                     setCurrentProduct(item.name);
-                    if (item.price) setCurrentValor(item.price);
+                    if (item.price) setCurrentPrecioVenta(item.price);
                   }}
+                  disabled={loading}
                 />
               </div>
 
               <div className="add-product-row">
                 <div className="input-group-small">
                   <label>Talla</label>
-                  <select value={currentTalla} onChange={(e) => setCurrentTalla(e.target.value)} className="custom-select">
+                  <select value={currentTalla} onChange={(e) => setCurrentTalla(e.target.value)} disabled={loading} className="custom-select">
                     {tallasList.map(t => <option key={t} value={t}>{t}</option>)}
                   </select>
                 </div>
@@ -178,22 +185,36 @@ export const PurchaseModal = ({ isOpen, onClose, mode, purchaseData, onSave }) =
                     type="number" min="1" value={currentCantidad} 
                     onChange={(e) => { setCurrentCantidad(e.target.value); if(errors.currentCantidad) setErrors({...errors, currentCantidad: false}); }}
                     className={errors.currentCantidad ? 'input-error' : ''}
+                    disabled={loading}
                   />
                   {errors.currentCantidad && <span className="error-text-absolute">Requerido</span>}
                 </div>
 
                 <div className="input-group-small">
-                  <label>Valor Unitario <span className="required-asterisk">*</span></label>
+                  <label>Precio Compra <span className="required-asterisk">*</span></label>
                   <input 
                     type="number" min="0" value={currentValor} 
                     onChange={(e) => { setCurrentValor(e.target.value); if(errors.currentValor) setErrors({...errors, currentValor: false}); }}
                     placeholder="Ej: 50000" 
                     className={errors.currentValor ? 'input-error' : ''}
+                    disabled={loading}
                   />
                   {errors.currentValor && <span className="error-text-absolute">Requerido</span>}
                 </div>
+
+                <div className="input-group-small">
+                  <label>Precio Venta <span className="required-asterisk">*</span></label>
+                  <input 
+                    type="number" min="0" value={currentPrecioVenta} 
+                    onChange={(e) => { setCurrentPrecioVenta(e.target.value); if(errors.currentPrecioVenta) setErrors({...errors, currentPrecioVenta: false}); }}
+                    placeholder="Ej: 120000" 
+                    className={errors.currentPrecioVenta ? 'input-error' : ''}
+                    disabled={loading}
+                  />
+                  {errors.currentPrecioVenta && <span className="error-text-absolute">Requerido</span>}
+                </div>
                 
-                <button className="btn-agregar" onClick={handleAddToCart}>
+                <button className="btn-agregar" onClick={handleAddToCart} disabled={loading}>
                   Agregar
                 </button>
               </div>
@@ -213,7 +234,8 @@ export const PurchaseModal = ({ isOpen, onClose, mode, purchaseData, onSave }) =
                     <th>Producto</th>
                     <th>Talla</th>
                     <th>Cantidad</th>
-                    <th>Valor Unit.</th>
+                    <th>Costo Compra</th>
+                    <th>Precio Venta</th>
                     <th>Total</th>
                     {!isViewOnly && <th></th>}
                   </tr>
@@ -222,13 +244,14 @@ export const PurchaseModal = ({ isOpen, onClose, mode, purchaseData, onSave }) =
                   {cart.map((item, index) => (
                     <tr key={index}>
                       <td className="cart-prod-name">{item.product}</td>
-                      <td>{item.talla}</td>
-                      <td>{item.cantidad}</td>
-                      <td>{formatCurrency(item.valorUnitario)}</td>
-                      <td className="cart-total-cell">{formatCurrency(item.total)}</td>
+                      <td>{item.talla || item.size}</td>
+                      <td>{item.cantidad || item.quantity}</td>
+                      <td>{formatCurrency(item.valorUnitario || item.unitCost)}</td>
+                      <td>{formatCurrency(item.precioVenta || item.precio_venta || 0)}</td>
+                      <td className="cart-total-cell">{formatCurrency(item.total || ((item.cantidad || item.quantity) * (item.valorUnitario || item.unitCost)))}</td>
                       {!isViewOnly && (
                         <td style={{ textAlign: 'right' }}>
-                          <button className="btn-remove-item" onClick={() => handleRemoveFromCart(index)} title="Quitar producto">
+                          <button className="btn-remove-item" onClick={() => handleRemoveFromCart(index)} disabled={loading} title="Quitar producto">
                             <Trash2 size={18} />
                           </button>
                         </td>
@@ -237,7 +260,7 @@ export const PurchaseModal = ({ isOpen, onClose, mode, purchaseData, onSave }) =
                   ))}
                   {cart.length === 0 && (
                     <tr>
-                      <td colSpan={isViewOnly ? "5" : "6"} className="cart-empty">
+                      <td colSpan={isViewOnly ? "6" : "7"} className="cart-empty">
                         No hay productos en esta compra. Agrega uno arriba.
                       </td>
                     </tr>
@@ -255,8 +278,10 @@ export const PurchaseModal = ({ isOpen, onClose, mode, purchaseData, onSave }) =
 
         {!isViewOnly && (
           <div className="modal-footer">
-            <button className="btn-secondary" onClick={onClose}>Cancelar</button>
-            <button className="btn-primary-modal" onClick={handleSubmit}>{buttonText}</button>
+            <button className="btn-secondary" onClick={onClose} disabled={loading}>Cancelar</button>
+            <button className="btn-primary-modal" onClick={handleSubmit} disabled={loading}>
+              {loading ? 'Guardando...' : buttonText}
+            </button>
           </div>
         )}
       </div>

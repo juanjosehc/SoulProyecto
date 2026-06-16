@@ -54,11 +54,14 @@ export const generateRecordPDF = (title, metaInfo, columns, rows, total, filenam
     doc.text(`${info.label}:`, 14, startY);
     
     doc.setFont("helvetica", "normal");
-    // Calcular ancho del label para dibujar el valor al lado
-    const textWidth = doc.getTextWidth(`${info.label}: `);
-    doc.text(String(info.value), 14 + textWidth, startY);
+    const valStr = String(info.value || '');
+    // Wrap text to a max width of 135mm to fit within the page margins (210 - 60 - 15)
+    const lines = doc.splitTextToSize(valStr, 135);
+    lines.forEach((line, index) => {
+      doc.text(line, 60, startY + (index * 5));
+    });
     
-    startY += 6;
+    startY += Math.max(1, lines.length) * 5 + 2;
   });
 
   startY += 6;

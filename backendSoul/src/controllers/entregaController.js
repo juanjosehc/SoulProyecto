@@ -14,6 +14,7 @@ const obtenerEntregas = async (req, res) => {
         p.estado as status,
         p.total,
         p.observaciones as notes,
+        u.nombre as "deliveryPerson",
         COALESCE(
           (SELECT json_agg(
             json_build_object(
@@ -29,6 +30,7 @@ const obtenerEntregas = async (req, res) => {
           ), '[]'::json
         ) as items
       FROM pedidos p
+      LEFT JOIN usuarios u ON p.usuario_id = u.id
       WHERE p.estado = 'En tránsito'
       ORDER BY p.id DESC
     `);
@@ -38,12 +40,12 @@ const obtenerEntregas = async (req, res) => {
   }
 };
 
-// 2. Cambiar estado de entrega
+// 2. Cambiar estado de entrega (Sincroniza con motivo de anulación)
 const cambiarEstadoEntrega = async (req, res) => {
   const cliente = await pool.connect();
   try {
     const { id } = req.params;
-    const { estado } = req.body;
+    const { estado, motivo_anulacion } = req.body;
 
     await cliente.query('BEGIN');
 
@@ -58,8 +60,12 @@ const cambiarEstadoEntrega = async (req, res) => {
     if (pedidoResult.rows.length === 0) throw new Error('Pedido no encontrado');
     const pedido = pedidoResult.rows[0];
 
-    // Actualizar estado del pedido
-    await cliente.query('UPDATE pedidos SET estado = $1 WHERE id = $2', [estado, id]);
+    // Actualizar estado del pedido (y motivo de anulación si aplica)
+    if (estado === 'Anulado') {
+      await cliente.query('UPDATE pedidos SET estado = $1, motivo_anulacion = $2 WHERE id = $3', [estado, motivo_anulacion || '', id]);
+    } else {
+      await cliente.query('UPDATE pedidos SET estado = $1 WHERE id = $2', [estado, id]);
+    }
 
     // LÓGICA: Si pasa a "Completado", crear venta automáticamente
     if (estado === 'Completado') {
@@ -102,4 +108,46 @@ const cambiarEstadoEntrega = async (req, res) => {
   }
 };
 
-module.exports = { obtenerEntregas, cambiarEstadoEntrega };
+// 3. Obtener historial exclusivo de entregas asignadas al domiciliario logueado
+const obtenerHistorialEntrega = async (req, res) => {
+  try {
+    const domiciliarioId = req.user.id;
+    const result = await pool.query(`
+      SELECT 
+        p.id,
+        p.codigo_pedido as "orderCode",
+        p.nombre_cliente as "clientName",
+        p.telefono as phone,
+        p.direccion_entrega as address,
+        TO_CHAR(p.fecha_entrega, 'YYYY-MM-DD') as date,
+        p.estado as status,
+        p.total,
+        p.observaciones as notes,
+        p.motivo_anulacion as "motivoAnulacion",
+        u.nombre as "deliveryPerson",
+        COALESCE(
+          (SELECT json_agg(
+            json_build_object(
+              'product', prod.nombre,
+              'talla', dp.talla,
+              'cantidad', dp.cantidad,
+              'valorUnitario', dp.precio_unitario,
+              'total', dp.subtotal
+            )
+          ) FROM detalle_pedidos dp
+            JOIN productos prod ON dp.producto_id = prod.id
+            WHERE dp.pedido_id = p.id
+          ), '[]'::json
+        ) as items
+      FROM pedidos p
+      LEFT JOIN usuarios u ON p.usuario_id = u.id
+      WHERE p.usuario_id = $1 AND p.estado != 'Pendiente'
+      ORDER BY p.id DESC
+    `, [domiciliarioId]);
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+module.exports = { obtenerEntregas, cambiarEstadoEntrega, obtenerHistorialEntrega };

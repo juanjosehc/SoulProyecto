@@ -16,6 +16,7 @@ export const Compras = () => {
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [purchaseToDelete, setPurchaseToDelete] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const cargarCompras = async () => {
     try {
@@ -34,6 +35,7 @@ export const Compras = () => {
   }, []);
 
   const handleSavePurchase = async (purchaseDataFromModal) => {
+    setLoading(true);
     try {
       // 🚨 ADAPTACIÓN AL BACKEND: Mapeamos la data del modal a la estructura exacta de compraController.js
       const payload = {
@@ -46,7 +48,8 @@ export const Compras = () => {
           product: item.product,
           size: item.talla,
           quantity: item.cantidad,
-          unitCost: item.valorUnitario
+          unitCost: item.valorUnitario,
+          sellingPrice: item.precioVenta
         }))
       };
 
@@ -66,16 +69,26 @@ export const Compras = () => {
       handleCloseModal();
     } catch (error) {
       console.error("Error al guardar compra:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleConfirmDelete = async () => {
+    setLoading(true);
     try {
-      await fetch(`http://localhost:3000/api/compras/${purchaseToDelete.id}`, { method: 'DELETE' });
-      cargarCompras();
-      handleCloseDelete();
+      const respuesta = await fetch(`http://localhost:3000/api/compras/${purchaseToDelete.id}`, { method: 'DELETE' });
+      if (!respuesta.ok) {
+        const errData = await respuesta.json();
+        alert(errData.error || "No se pudo anular la compra.");
+      } else {
+        cargarCompras();
+        handleCloseDelete();
+      }
     } catch (error) {
       console.error("Error al eliminar:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -145,9 +158,9 @@ export const Compras = () => {
         <div className="header-actions">
           <div className="search-container">
             <Search size={18} className="search-icon" />
-            <input type="text" placeholder="Buscar por proveedor..." value={searchTerm} onChange={handleSearch} className="search-input" />
+            <input type="text" placeholder="Buscar por proveedor..." value={searchTerm} onChange={handleSearch} disabled={loading} className="search-input" />
           </div>
-          <button className="btn-primary" onClick={handleOpenCreate}>
+          <button className="btn-primary" onClick={handleOpenCreate} disabled={loading}>
             <Plus size={18} /> Registrar Compra
           </button>
         </div>
@@ -182,11 +195,11 @@ export const Compras = () => {
                   </td>
                   <td>
                     <div className="action-buttons">
-                      <button className="btn-action" title="Ver detalle" onClick={() => handleOpenView(purchase)}><Eye size={18} /></button>
-                      <button className="btn-action" title="Descargar PDF" onClick={() => handleGeneratePDF(purchase)}><FileText size={18} /></button>
+                      <button className="btn-action" title="Ver detalle" onClick={() => handleOpenView(purchase)} disabled={loading}><Eye size={18} /></button>
+                      <button className="btn-action" title="Descargar PDF" onClick={() => handleGeneratePDF(purchase)} disabled={loading}><FileText size={18} /></button>
                       
                       {purchase.status !== 'Anulada' && (
-                        <button className="btn-action btn-delete" title="Anular Compra" onClick={() => handleOpenDelete(purchase)}><Trash2 size={18} /></button>
+                        <button className="btn-action btn-delete" title="Anular Compra" onClick={() => handleOpenDelete(purchase)} disabled={loading}><Trash2 size={18} /></button>
                       )}
                     </div>
                   </td>
@@ -201,26 +214,26 @@ export const Compras = () => {
 
       {totalPages > 1 && (
         <div className="pagination-container">
-          <button className="btn-page" onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
+          <button className="btn-page" onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1 || loading}>
             <ChevronLeft size={18} />
           </button>
           <span className="page-indicator">
             Página {currentPage} de {totalPages}
           </span>
-          <button className="btn-page" onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
+          <button className="btn-page" onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages || loading}>
             <ChevronRight size={18} />
           </button>
         </div>
       )}
 
-      <PurchaseModal isOpen={isModalOpen} onClose={handleCloseModal} mode={modalMode} purchaseData={selectedPurchase} onSave={handleSavePurchase} />
+      <PurchaseModal isOpen={isModalOpen} onClose={handleCloseModal} mode={modalMode} purchaseData={selectedPurchase} onSave={handleSavePurchase} loading={loading} />
 
       {isDeleteModalOpen && (
         <div className="modal-overlay">
           <div className="modal-container modal-small">
             <div className="modal-header">
               <h2>Confirmar Anulación</h2>
-              <button className="btn-close" onClick={handleCloseDelete}><X size={20} /></button>
+              <button className="btn-close" onClick={handleCloseDelete} disabled={loading}><X size={20} /></button>
             </div>
             <div className="modal-body">
               <p style={{ color: '#e4e4e7', fontSize: '15px' }}>
@@ -229,8 +242,10 @@ export const Compras = () => {
               </p>
             </div>
             <div className="modal-footer">
-              <button className="btn-secondary" onClick={handleCloseDelete}>Cancelar</button>
-              <button className="btn-danger" onClick={handleConfirmDelete}>Sí, anular</button>
+              <button className="btn-secondary" onClick={handleCloseDelete} disabled={loading}>Cancelar</button>
+              <button className="btn-danger" onClick={handleConfirmDelete} disabled={loading}>
+                {loading ? 'Anulando...' : 'Sí, anular'}
+              </button>
             </div>
           </div>
         </div>

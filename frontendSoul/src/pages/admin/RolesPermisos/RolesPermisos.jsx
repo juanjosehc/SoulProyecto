@@ -15,6 +15,8 @@ export const RolesPermisos = () => {
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [roleToDelete, setRoleToDelete] = useState(null);
+  const [deleteError, setDeleteError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   // ==========================================
   // CONEXIÓN CON EL BACKEND
@@ -36,6 +38,7 @@ export const RolesPermisos = () => {
   }, []);
 
   const handleSaveRole = async (roleDataFromModal) => {
+    setLoading(true);
     try {
       const url = modalMode === 'create' 
         ? 'http://localhost:3000/api/roles' 
@@ -65,6 +68,8 @@ export const RolesPermisos = () => {
       handleCloseModal();
     } catch (error) {
       console.error("Error al guardar rol:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -72,6 +77,7 @@ export const RolesPermisos = () => {
     const role = roles.find(r => r.id === id);
     if (!role) return;
 
+    setLoading(true);
     try {
       await fetch(`http://localhost:3000/api/roles/${id}/estado`, {
         method: 'PATCH',
@@ -81,10 +87,14 @@ export const RolesPermisos = () => {
       cargarRoles();
     } catch (error) {
       console.error("Error al cambiar estado:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleConfirmDelete = async () => {
+    setLoading(true);
+    setDeleteError('');
     try {
       const respuesta = await fetch(`http://localhost:3000/api/roles/${roleToDelete.id}`, {
         method: 'DELETE'
@@ -92,13 +102,16 @@ export const RolesPermisos = () => {
       
       if (!respuesta.ok) {
         const error = await respuesta.json();
-        alert(error.error || "No se pudo eliminar el rol");
+        setDeleteError(error.error || "No se puede eliminar este rol.");
       } else {
         cargarRoles();
+        handleCloseDelete();
       }
-      handleCloseDelete();
     } catch (error) {
       console.error("Error al eliminar:", error);
+      setDeleteError("Ocurrió un error al conectar con el servidor.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -109,8 +122,8 @@ export const RolesPermisos = () => {
   const handleOpenEdit = (role) => { setModalMode('edit'); setSelectedRole(role); setIsModalOpen(true); };
   const handleOpenView = (role) => { setModalMode('view'); setSelectedRole(role); setIsModalOpen(true); };
   const handleCloseModal = () => { setIsModalOpen(false); setSelectedRole(null); };
-  const handleOpenDelete = (role) => { setRoleToDelete(role); setIsDeleteModalOpen(true); };
-  const handleCloseDelete = () => { setIsDeleteModalOpen(false); setRoleToDelete(null); };
+  const handleOpenDelete = (role) => { setRoleToDelete(role); setDeleteError(''); setIsDeleteModalOpen(true); };
+  const handleCloseDelete = () => { setIsDeleteModalOpen(false); setRoleToDelete(null); setDeleteError(''); };
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
@@ -152,7 +165,7 @@ export const RolesPermisos = () => {
             <Search size={18} className="search-icon" />
             <input type="text" placeholder="Buscar por rol, módulo o estado..." value={searchTerm} onChange={handleSearch} className="search-input" />
           </div>
-          <button className="btn-primary" onClick={handleOpenCreate}>
+          <button className="btn-primary" onClick={handleOpenCreate} disabled={loading}>
             <Plus size={18} /> Nuevo Rol
           </button>
         </div>
@@ -191,13 +204,13 @@ export const RolesPermisos = () => {
                   </td>
                   <td>
                     <div className="action-buttons">
-                      <button className="btn-action" title="Ver detalle" onClick={() => handleOpenView(role)}><Eye size={18} /></button>
+                      <button className="btn-action" title="Ver detalle" onClick={() => handleOpenView(role)} disabled={loading}><Eye size={18} /></button>
                       
                       {role.name !== 'Administrador' && (
                         <>
-                          <button className="btn-action" title="Editar" onClick={() => handleOpenEdit(role)}><Edit size={18} /></button>
-                          <button className={`btn-action ${!role.isActive ? 'power-off' : ''}`} onClick={() => toggleRoleStatus(role.id)}><Power size={18} /></button>
-                          <button className="btn-action btn-delete" onClick={() => handleOpenDelete(role)}><Trash2 size={18} /></button>
+                          <button className="btn-action" title="Editar" onClick={() => handleOpenEdit(role)} disabled={loading}><Edit size={18} /></button>
+                          <button className={`btn-action ${!role.isActive ? 'power-off' : ''}`} onClick={() => toggleRoleStatus(role.id)} disabled={loading}><Power size={18} /></button>
+                          <button className="btn-action btn-delete" onClick={() => handleOpenDelete(role)} disabled={loading}><Trash2 size={18} /></button>
                         </>
                       )}
                     </div>
@@ -213,27 +226,36 @@ export const RolesPermisos = () => {
 
       {totalPages > 1 && (
         <div className="pagination-container">
-          <button className="btn-page" onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}><ChevronLeft size={18} /></button>
+          <button className="btn-page" onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1 || loading}><ChevronLeft size={18} /></button>
           <span className="page-indicator">Página {currentPage} de {totalPages}</span>
-          <button className="btn-page" onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}><ChevronRight size={18} /></button>
+          <button className="btn-page" onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages || loading}><ChevronRight size={18} /></button>
         </div>
       )}
 
-      <RoleModal isOpen={isModalOpen} onClose={handleCloseModal} mode={modalMode} roleData={selectedRole} onSave={handleSaveRole} />
+      <RoleModal isOpen={isModalOpen} onClose={handleCloseModal} mode={modalMode} roleData={selectedRole} onSave={handleSaveRole} loading={loading} />
 
       {isDeleteModalOpen && (
         <div className="modal-overlay">
           <div className="modal-container modal-small">
             <div className="modal-header">
               <h2>Confirmar Eliminación</h2>
-              <button className="btn-close" onClick={handleCloseDelete} title="Cerrar"><X size={20} /></button>
+              <button className="btn-close" onClick={handleCloseDelete} title="Cerrar" disabled={loading}><X size={20} /></button>
             </div>
             <div className="modal-body">
-              <p style={{ color: '#e4e4e7', fontSize: '15px' }}>¿Estás seguro de que deseas eliminar el rol <strong>"{roleToDelete?.name}"</strong>?</p>
+              <p style={{ color: '#e4e4e7', fontSize: '15px' }}>
+                ¿Estás seguro de que deseas eliminar el rol <strong>"{roleToDelete?.name}"</strong>?
+              </p>
+              {deleteError && (
+                <div style={{ marginTop: '16px', padding: '10px', backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', borderRadius: '6px', color: '#ef4444', fontSize: '14px' }}>
+                  {deleteError}
+                </div>
+              )}
             </div>
             <div className="modal-footer">
-              <button className="btn-secondary" onClick={handleCloseDelete}>Cancelar</button>
-              <button className="btn-danger" onClick={handleConfirmDelete}>Sí, eliminar</button>
+              <button className="btn-secondary" onClick={handleCloseDelete} disabled={loading}>Cancelar</button>
+              <button className="btn-danger" onClick={handleConfirmDelete} disabled={loading}>
+                {loading ? 'Eliminando...' : 'Sí, eliminar'}
+              </button>
             </div>
           </div>
         </div>

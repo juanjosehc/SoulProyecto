@@ -7,10 +7,10 @@ import './OrderModal.css';
 
 const API = 'http://localhost:3000/api';
 
-export const OrderModal = ({ isOpen, onClose, mode, orderData, onSave }) => {
+export const OrderModal = ({ isOpen, onClose, mode, orderData, onSave, loading }) => {
   const [formData, setFormData] = useState({
     clientName: '', phone: '', deliveryDate: '', deliveryAddress: '', observations: '', orderStatus: 'Pendiente',
-    clienteId: null, usuarioId: null, domiciliarioName: ''
+    clienteId: null, usuarioId: null, domiciliarioName: '', motivoAnulacion: ''
   });
 
   const [cart, setCart] = useState([]);
@@ -32,11 +32,12 @@ export const OrderModal = ({ isOpen, onClose, mode, orderData, onSave }) => {
         deliveryDate: orderData.deliveryDate || '', deliveryAddress: orderData.deliveryAddress || '', 
         observations: orderData.observations || '', orderStatus: orderData.orderStatus || 'Pendiente',
         clienteId: orderData.clienteId || null, usuarioId: orderData.usuarioId || null,
-        domiciliarioName: orderData.domiciliarioName || ''
+        domiciliarioName: orderData.domiciliarioName || '',
+        motivoAnulacion: orderData.motivoAnulacion || ''
       });
       setCart(orderData.items || []); setErrors({});
     } else if (isOpen && mode === 'create') {
-      setFormData({ clientName: '', phone: '', deliveryDate: '', deliveryAddress: '', observations: '', orderStatus: 'Pendiente', clienteId: null, usuarioId: null, domiciliarioName: '' });
+      setFormData({ clientName: '', phone: '', deliveryDate: '', deliveryAddress: '', observations: '', orderStatus: 'Pendiente', clienteId: null, usuarioId: null, domiciliarioName: '', motivoAnulacion: '' });
       setCart([]); setCurrentProduct(''); setCurrentCantidad(1); setCurrentValor('');
       setTallasDisponibles([]); setStockActual(0); setStockError(''); setErrors({});
     }
@@ -149,7 +150,7 @@ export const OrderModal = ({ isOpen, onClose, mode, orderData, onSave }) => {
       <div className="modal-container modal-large-order">
         <div className="modal-header">
           <h2>{title}</h2>
-          <button className="btn-close" onClick={onClose}><X size={20} /></button>
+          <button className="btn-close" onClick={onClose} disabled={loading}><X size={20} /></button>
         </div>
 
         <div className="modal-body split-grid-body">
@@ -173,25 +174,26 @@ export const OrderModal = ({ isOpen, onClose, mode, orderData, onSave }) => {
                     displayKey="nombres"
                     onSelect={handleClienteSelect}
                     className={errors.clientName ? 'input-error' : ''}
+                    disabled={loading}
                   />
                 )}
                 {errors.clientName && <span className="error-text">El cliente es obligatorio.</span>}
               </div>
               <div className="input-group">
                 <label>Teléfono <span className="required-asterisk">*</span></label>
-                <input type="text" name="phone" value={formData.phone} onChange={handleChange} disabled={isViewOnly} placeholder="Ej: 3001234567" className={errors.phone ? 'input-error' : ''} />
+                <input type="text" name="phone" value={formData.phone} onChange={handleChange} disabled={isViewOnly || loading} placeholder="Ej: 3001234567" className={errors.phone ? 'input-error' : ''} />
                 {errors.phone && <span className="error-text">El teléfono es obligatorio.</span>}
               </div>
             </div>
             <div className="form-group-stack">
               <div className="input-group">
                 <label>Fecha de Entrega <span className="required-asterisk">*</span></label>
-                <input type="date" name="deliveryDate" value={formData.deliveryDate} onChange={handleChange} disabled={isViewOnly} className={`date-input ${errors.deliveryDate ? 'input-error' : ''}`} />
+                <input type="date" name="deliveryDate" value={formData.deliveryDate} onChange={handleChange} disabled={isViewOnly || loading} className={`date-input ${errors.deliveryDate ? 'input-error' : ''}`} />
                 {errors.deliveryDate && <span className="error-text">La fecha es obligatoria.</span>}
               </div>
               <div className="input-group">
                 <label>Dirección <span className="required-asterisk">*</span></label>
-                <input type="text" name="deliveryAddress" value={formData.deliveryAddress} onChange={handleChange} disabled={isViewOnly} placeholder="Ej: Calle 123 #45-67" className={`date-input ${errors.deliveryAddress ? 'input-error' : ''}`} />
+                <input type="text" name="deliveryAddress" value={formData.deliveryAddress} onChange={handleChange} disabled={isViewOnly || loading} placeholder="Ej: Calle 123 #45-67" className={`date-input ${errors.deliveryAddress ? 'input-error' : ''}`} />
                 {errors.deliveryAddress && <span className="error-text">La dirección es obligatoria.</span>}
               </div>
             </div>
@@ -209,13 +211,20 @@ export const OrderModal = ({ isOpen, onClose, mode, orderData, onSave }) => {
                   placeholder="Buscar domiciliario..."
                   displayKey="name"
                   onSelect={handleDomiciliarioSelect}
+                  disabled={loading}
                 />
               )}
             </div>
             <div className="input-group" style={{marginTop: '12px'}}>
               <label>Observaciones</label>
-              <textarea name="observations" value={formData.observations} onChange={handleChange} disabled={isViewOnly} placeholder="Instrucciones especiales..." rows="3" className="textarea-field" />
+              <textarea name="observations" value={formData.observations} onChange={handleChange} disabled={isViewOnly || loading} placeholder="Instrucciones especiales..." rows="3" className="textarea-field" />
             </div>
+            {formData.orderStatus === 'Anulado' && (
+              <div className="input-group" style={{marginTop: '16px', border: '1px solid #ef4444', padding: '12px', borderRadius: '6px', backgroundColor: 'rgba(239, 68, 68, 0.05)'}}>
+                <label style={{color: '#ef4444', fontWeight: 'bold', fontSize: '13px', display: 'block', marginBottom: '6px'}}>Motivo de Anulación</label>
+                <p style={{color: '#f4f4f5', margin: 0, fontSize: '14px', lineHeight: '1.4'}}>{formData.motivoAnulacion || 'No especificado'}</p>
+              </div>
+            )}
           </div>
 
           {/* PANEL DERECHO: CARRITO */}
@@ -229,13 +238,13 @@ export const OrderModal = ({ isOpen, onClose, mode, orderData, onSave }) => {
               <div className="add-product-box">
                 <div className="input-group-small" style={{marginBottom: '12px'}}>
                   <label>Buscar Producto</label>
-                  <AutocompleteInput value={currentProduct} onChange={(val) => setCurrentProduct(val)} fetchUrl={`${API}/productos/search`} placeholder="Escribir nombre..." onSelect={handleProductSelect} />
+                  <AutocompleteInput value={currentProduct} onChange={(val) => setCurrentProduct(val)} fetchUrl={`${API}/productos/search`} placeholder="Escribir nombre..." onSelect={handleProductSelect} disabled={loading} />
                 </div>
                 
                 <div className="add-product-row">
                   <div className="input-group-small" style={{flex: 0.8}}>
                     <label>Talla</label>
-                    <select value={currentTalla} onChange={(e) => handleTallaChange(e.target.value)} className="custom-select">
+                    <select value={currentTalla} onChange={(e) => handleTallaChange(e.target.value)} disabled={loading} className="custom-select">
                       {tallasDisponibles.length > 0 ? (
                         tallasDisponibles.map(t => <option key={t.talla} value={t.talla}>{t.talla} (stock: {t.stock})</option>)
                       ) : (
@@ -245,13 +254,13 @@ export const OrderModal = ({ isOpen, onClose, mode, orderData, onSave }) => {
                   </div>
                   <div className="input-group-small" style={{flex: 0.6}}>
                     <label>Cant. <span className="required-asterisk">*</span></label>
-                    <input type="number" min="1" max={stockActual || 999} value={currentCantidad} onChange={(e) => { setCurrentCantidad(e.target.value); setStockError(''); if (errors.currentCantidad) setErrors(prev => ({ ...prev, currentCantidad: false })); }} className={errors.currentCantidad ? 'input-error' : ''} />
+                    <input type="number" min="1" max={stockActual || 999} value={currentCantidad} onChange={(e) => { setCurrentCantidad(e.target.value); setStockError(''); if (errors.currentCantidad) setErrors(prev => ({ ...prev, currentCantidad: false })); }} disabled={loading} className={errors.currentCantidad ? 'input-error' : ''} />
                   </div>
                   <div className="input-group-small" style={{flex: 1.2}}>
                     <label>Precio Unit. <span className="required-asterisk">*</span></label>
-                    <input type="number" min="0" value={currentValor} onChange={(e) => { setCurrentValor(e.target.value); if (errors.currentValor) setErrors(prev => ({ ...prev, currentValor: false })); }} placeholder="Ej: 120000" className={errors.currentValor ? 'input-error' : ''} />
+                    <input type="number" min="0" value={currentValor} onChange={(e) => { setCurrentValor(e.target.value); if (errors.currentValor) setErrors(prev => ({ ...prev, currentValor: false })); }} disabled={loading} placeholder="Ej: 120000" className={errors.currentValor ? 'input-error' : ''} />
                   </div>
-                  <button className="btn-agregar-estetico" onClick={handleAddToCart}>Agregar</button>
+                  <button className="btn-agregar-estetico" onClick={handleAddToCart} disabled={loading}>Agregar</button>
                 </div>
                 {stockError && <span className="error-text" style={{marginTop: '6px'}}>{stockError}</span>}
               </div>
@@ -277,7 +286,7 @@ export const OrderModal = ({ isOpen, onClose, mode, orderData, onSave }) => {
                       <td style={{color: '#C9A24D', fontWeight: 500}}>{formatCOP(item.total)}</td>
                       {!isViewOnly && (
                         <td style={{ textAlign: 'right' }}>
-                          <button className="btn-remove-item" onClick={() => handleRemoveFromCart(index)}><Trash2 size={16} /></button>
+                          <button className="btn-remove-item" onClick={() => handleRemoveFromCart(index)} disabled={loading}><Trash2 size={16} /></button>
                         </td>
                       )}
                     </tr>
@@ -296,8 +305,8 @@ export const OrderModal = ({ isOpen, onClose, mode, orderData, onSave }) => {
 
         {!isViewOnly && (
           <div className="modal-footer">
-            <button className="btn-secondary" onClick={onClose}>Cancelar</button>
-            <button className="btn-primary-modal" onClick={handleSubmit}>{buttonText}</button>
+            <button className="btn-secondary" onClick={onClose} disabled={loading}>Cancelar</button>
+            <button className="btn-primary-modal" onClick={handleSubmit} disabled={loading}>{loading ? 'Guardando...' : buttonText}</button>
           </div>
         )}
       </div>

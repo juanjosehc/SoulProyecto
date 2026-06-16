@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { obtenerPedidos, crearPedido, editarPedido, cambiarEstadoPedido } = require('../controllers/pedidoController');
+const { obtenerPedidos, crearPedido, editarPedido, cambiarEstadoPedido, obtenerPedidosCliente } = require('../controllers/pedidoController');
 const { verificarPermiso } = require('../middleware/authMiddleware');
 
+router.get('/mi-historial', obtenerPedidosCliente);
 router.get('/', verificarPermiso('MODULO_PEDIDOS'), obtenerPedidos);
 router.post('/', crearPedido);
 router.put('/:id', verificarPermiso('MODULO_PEDIDOS'), editarPedido);

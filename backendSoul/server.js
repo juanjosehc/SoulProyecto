@@ -19,6 +19,7 @@ const pedidoRoutes = require('./src/routes/pedidoRoutes');
 const ventaRoutes = require('./src/routes/ventaRoutes');
 const entregaRoutes = require('./src/routes/entregaRoutes');
 const dashboardRoutes = require('./src/routes/dashboardRoutes');
+const carritoRoutes = require('./src/routes/carritoRoutes');
 
 const app = express();
 
@@ -44,6 +45,7 @@ app.use('/api/proveedores', verificarToken, verificarPermiso('MODULO_PROVEEDORES
 app.use('/api/compras', verificarToken, verificarPermiso('MODULO_COMPRAS'), compraRoutes);
 app.use('/api/clientes', verificarToken, clienteRoutes);
 app.use('/api/pedidos', verificarToken, pedidoRoutes);
+app.use('/api/carrito', verificarToken, carritoRoutes);
 app.use('/api/ventas', verificarToken, verificarPermiso('MODULO_VENTAS'), ventaRoutes);
 app.use('/api/entregas', verificarToken, verificarPermiso('MODULO_ENTREGAS'), entregaRoutes);
 app.use('/api/dashboard', verificarToken, verificarPermiso('MODULO_DASHBOARD'), dashboardRoutes);

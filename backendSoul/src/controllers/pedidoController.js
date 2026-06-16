@@ -17,6 +17,7 @@ const obtenerPedidos = async (req, res) => {
         p.estado as "orderStatus",
         p.total,
         p.created_at,
+        p.motivo_anulacion as "motivoAnulacion",
         u.nombre as "domiciliarioName",
         COALESCE(
           (SELECT json_agg(
@@ -138,7 +139,7 @@ const cambiarEstadoPedido = async (req, res) => {
   const cliente = await pool.connect();
   try {
     const { id } = req.params;
-    const { estado } = req.body;
+    const { estado, motivo_anulacion, usuarioId } = req.body;
 
     await cliente.query('BEGIN');
 
@@ -154,7 +155,21 @@ const cambiarEstadoPedido = async (req, res) => {
     const pedido = pedidoResult.rows[0];
 
     // Actualizar estado del pedido
-    await cliente.query('UPDATE pedidos SET estado = $1 WHERE id = $2', [estado, id]);
+    // Si se envía usuarioId (asignación de domiciliario), también se actualiza
+    if (estado === 'Anulado') {
+      await cliente.query(
+        'UPDATE pedidos SET estado = $1, motivo_anulacion = $2 WHERE id = $3',
+        [estado, motivo_anulacion || '', id]
+      );
+    } else if (usuarioId != null) {
+      // Cambio de estado + asignación de domiciliario (ej: Pendiente -> En tránsito)
+      await cliente.query(
+        'UPDATE pedidos SET estado = $1, usuario_id = $2 WHERE id = $3',
+        [estado, usuarioId, id]
+      );
+    } else {
+      await cliente.query('UPDATE pedidos SET estado = $1 WHERE id = $2', [estado, id]);
+    }
 
     // LÓGICA: Si pasa a "Completado", crear venta automáticamente
     if (estado === 'Completado' && pedido.estado !== 'Completado') {
@@ -200,4 +215,50 @@ const cambiarEstadoPedido = async (req, res) => {
   }
 };
 
-module.exports = { obtenerPedidos, crearPedido, editarPedido, cambiarEstadoPedido };
+// Obtener historial de pedidos de un cliente
+const obtenerPedidosCliente = async (req, res) => {
+  try {
+    const clienteId = req.user.id;
+    if (req.user.tipo !== 'cliente') {
+      return res.status(403).json({ error: 'Solo los clientes pueden ver su historial de pedidos.' });
+    }
+
+    const result = await pool.query(`
+      SELECT 
+        p.id,
+        p.codigo_pedido as code,
+        p.nombre_cliente as "clientName",
+        p.telefono as phone,
+        p.direccion_entrega as "deliveryAddress",
+        TO_CHAR(p.fecha_entrega, 'YYYY-MM-DD') as "deliveryDate",
+        p.observaciones as observations,
+        p.estado as "orderStatus",
+        p.total,
+        p.created_at,
+        p.motivo_anulacion as "motivoAnulacion",
+        COALESCE(
+          (SELECT json_agg(
+            json_build_object(
+              'product', prod.nombre,
+              'talla', dp.talla,
+              'cantidad', dp.cantidad,
+              'valorUnitario', dp.precio_unitario,
+              'total', dp.subtotal
+            )
+          ) FROM detalle_pedidos dp
+            JOIN productos prod ON dp.producto_id = prod.id
+            WHERE dp.pedido_id = p.id
+          ), '[]'::json
+        ) as items
+      FROM pedidos p
+      WHERE p.cliente_id = $1
+      ORDER BY p.id DESC
+    `, [clienteId]);
+
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+module.exports = { obtenerPedidos, crearPedido, editarPedido, cambiarEstadoPedido, obtenerPedidosCliente };

@@ -1,7 +1,6 @@
 const pool = require('../config/db');
 
 // 1. Obtener todas las compras
-// 1. Obtener todas las compras
 const obtenerCompras = async (req, res) => {
   try {
     const result = await pool.query(`
@@ -20,6 +19,7 @@ const obtenerCompras = async (req, res) => {
               'talla', dc.talla_comprada,
               'cantidad', dc.cantidad,
               'valorUnitario', dc.precio_unitario,
+              'precioVenta', dc.precio_venta,
               'total', (dc.cantidad * dc.precio_unitario)
             )
           ) FROM detalle_compras dc
@@ -63,13 +63,23 @@ const crearCompra = async (req, res) => {
       if (prodResult.rows.length === 0) throw new Error(`El producto ${item.product} no existe.`);
       const productoId = prodResult.rows[0].id;
 
+      const sellingPrice = item.sellingPrice || item.precioVenta || item.precio_venta || 0;
+
       // 2. Insertar el detalle de la compra
       await cliente.query(
-        'INSERT INTO detalle_compras (compra_id, producto_id, talla_comprada, cantidad, precio_unitario) VALUES ($1, $2, $3, $4, $5)',
-        [nuevaCompraId, productoId, item.size, item.quantity, item.unitCost]
+        'INSERT INTO detalle_compras (compra_id, producto_id, talla_comprada, cantidad, precio_unitario, precio_venta) VALUES ($1, $2, $3, $4, $5, $6)',
+        [nuevaCompraId, productoId, item.size, item.quantity, item.unitCost, sellingPrice]
       );
 
-      // 3. Aumentar el Inventario (Solo si la compra está "Completada")
+      // 3. Sincronizar automáticamente el precio de venta en la tabla de productos
+      if (sellingPrice > 0) {
+        await cliente.query(
+          'UPDATE productos SET precio = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2',
+          [sellingPrice, productoId]
+        );
+      }
+
+      // 4. Aumentar el Inventario (Solo si la compra está "Completado")
       if (status === 'Completado') {
         // Intentamos actualizar la talla. Si la talla no existe, la creamos (UPSERT)
         await cliente.query(`

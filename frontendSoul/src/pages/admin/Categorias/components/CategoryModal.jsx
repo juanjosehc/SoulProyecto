@@ -2,7 +2,7 @@ import { X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import './CategoryModal.css';
 
-export const CategoryModal = ({ isOpen, onClose, mode, categoryData, onSave }) => {
+export const CategoryModal = ({ isOpen, onClose, mode, categoryData, onSave, loading }) => {
   const [formData, setFormData] = useState({
     name: '',
     description: ''
@@ -83,7 +83,7 @@ export const CategoryModal = ({ isOpen, onClose, mode, categoryData, onSave }) =
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                disabled={isViewOnly}
+                disabled={isViewOnly || loading}
                 placeholder="Ej: Zapatos Deportivos"
                 className={errors.name ? 'input-error' : ''}
               />
@@ -98,7 +98,7 @@ export const CategoryModal = ({ isOpen, onClose, mode, categoryData, onSave }) =
                 name="description"
                 value={formData.description}
                 onChange={handleChange}
-                disabled={isViewOnly}
+                disabled={isViewOnly || loading}
                 placeholder="Breve descripción de los productos en esta categoría..."
                 className="textarea-custom" // Quitamos la clase de error dinámica
                 rows="4"
@@ -110,9 +110,9 @@ export const CategoryModal = ({ isOpen, onClose, mode, categoryData, onSave }) =
 
         {!isViewOnly && (
           <div className="modal-footer">
-            <button className="btn-secondary" onClick={onClose}>Cancelar</button>
-            <button className="btn-primary-modal" onClick={handleSubmit}>
-              {buttonText}
+            <button className="btn-secondary" onClick={onClose} disabled={loading}>Cancelar</button>
+            <button className="btn-primary-modal" onClick={handleSubmit} disabled={loading}>
+              {loading ? 'Guardando...' : buttonText}
             </button>
           </div>
         )}

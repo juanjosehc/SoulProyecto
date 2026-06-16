@@ -148,16 +148,24 @@ export const DeliveryModal = ({ isOpen, onClose, mode, deliveryData, onSave }) =
             <div className="form-row">
               <div className="input-group half-width">
                 <label>Domiciliario Asignado {!isViewOnly && <span className="required-asterisk">*</span>}</label>
-                <select 
-                  name="deliveryPerson" 
-                  value={formData.deliveryPerson} 
-                  onChange={handleChange} 
-                  disabled={isViewOnly}
-                  className={errors.deliveryPerson ? 'input-error custom-select' : 'custom-select'}
-                >
-                  <option value="">Seleccione...</option>
-                  {domiciliariosDisponibles.map(dom => <option key={dom} value={dom}>{dom}</option>)}
-                </select>
+                {isViewOnly ? (
+                  <input 
+                    type="text" 
+                    value={formData.deliveryPerson || 'Sin asignar'} 
+                    disabled 
+                  />
+                ) : (
+                  <select 
+                    name="deliveryPerson" 
+                    value={formData.deliveryPerson} 
+                    onChange={handleChange} 
+                    disabled={isViewOnly}
+                    className={errors.deliveryPerson ? 'input-error custom-select' : 'custom-select'}
+                  >
+                    <option value="">Seleccione...</option>
+                    {domiciliariosDisponibles.map(dom => <option key={dom} value={dom}>{dom}</option>)}
+                  </select>
+                )}
                 {errors.deliveryPerson && <span className="error-text">Obligatorio.</span>}
               </div>
 

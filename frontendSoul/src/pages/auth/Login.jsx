@@ -16,6 +16,7 @@ export const Login = () => {
   const [regData, setRegData] = useState({ nombres: '', apellidos: '', correo: '', telefono: '', password: '', confirmPassword: '' });
   const [regError, setRegError] = useState('');
   const [regSuccess, setRegSuccess] = useState('');
+  const [phoneError, setPhoneError] = useState('');
 
   // Estados para recuperar contraseña
   const [showForgot, setShowForgot] = useState(false);
@@ -159,7 +160,7 @@ export const Login = () => {
         </div>
         <div className="login-form-panel">
           <div className="login-form-wrapper">
-            <button className="btn-back-auth" onClick={() => { setShowRegister(false); setRegError(''); setRegSuccess(''); }}>
+            <button className="btn-back-auth" onClick={() => { setShowRegister(false); setRegError(''); setRegSuccess(''); setPhoneError(''); }}>
               <ArrowLeft size={16} /> Volver al Login
             </button>
             <h2 className="login-title">Crear Cuenta</h2>
@@ -183,7 +184,22 @@ export const Login = () => {
               </div>
               <div className="input-group">
                 <label>Teléfono</label>
-                <input type="text" value={regData.telefono} onChange={(e) => setRegData({...regData, telefono: e.target.value})} placeholder="300 123 4567" />
+                <input 
+                  type="text" 
+                  value={regData.telefono} 
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    const cleanVal = val.replace(/[^0-9]/g, '');
+                    if (val !== cleanVal) {
+                      setPhoneError('Solo se permiten números');
+                    } else {
+                      setPhoneError('');
+                    }
+                    setRegData({...regData, telefono: cleanVal});
+                  }} 
+                  placeholder="3001234567" 
+                />
+                {phoneError && <span className="phone-error-msg" style={{color: '#ef4444', fontSize: '12px', marginTop: '4px', display: 'block'}}>{phoneError}</span>}
               </div>
               <div className="input-group">
                 <label>Contraseña *</label>

@@ -12,6 +12,7 @@ const obtenerVentas = async (req, res) => {
         v.total,
         v.estado as status,
         v.origen as origin,
+        u.nombre as "domiciliarioName",
         COALESCE(
           (SELECT json_agg(
             json_build_object(
@@ -29,6 +30,8 @@ const obtenerVentas = async (req, res) => {
         (SELECT COALESCE(SUM(dv2.cantidad), 0) FROM detalle_ventas dv2 WHERE dv2.venta_id = v.id) as "itemsCount"
       FROM ventas v
       LEFT JOIN clientes c ON v.cliente_id = c.id
+      LEFT JOIN pedidos p ON v.pedido_id = p.id
+      LEFT JOIN usuarios u ON p.usuario_id = u.id
       ORDER BY v.id DESC
     `);
     res.json(result.rows);
