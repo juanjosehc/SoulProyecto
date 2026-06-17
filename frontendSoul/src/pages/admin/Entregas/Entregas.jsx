@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Truck, Eye, Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Truck, Eye, Search, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { DeliveryModal } from './components/DeliveryModal';
 import './Entregas.css';
 
@@ -13,6 +13,20 @@ export const Entregas = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDelivery, setSelectedDelivery] = useState(null);
+
+  // Estados para justificación de anulación
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [cancellingDeliveryId, setCancellingDeliveryId] = useState(null);
+  const [cancelReason, setCancelReason] = useState('');
+  const [cancelError, setCancelError] = useState('');
+
+  // Toast notifications
+  const [toast, setToast] = useState({ message: '', type: '' });
+
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => setToast({ message: '', type: '' }), 3000);
+  };
 
   const cargarEntregas = async () => {
     try {
@@ -30,23 +44,47 @@ export const Entregas = () => {
   const handleCloseModal = () => { setIsModalOpen(false); setSelectedDelivery(null); };
 
   const handleChangeStatus = async (id, newStatus) => {
+    if (newStatus === 'Anulado') {
+      setCancellingDeliveryId(id);
+      setCancelReason('');
+      setCancelError('');
+      setIsCancelModalOpen(true);
+      return;
+    }
+    await procederCambioEstado(id, newStatus);
+  };
+
+  const procederCambioEstado = async (id, newStatus, motivoAnulacion = '') => {
     try {
       const res = await fetch(`${API}/entregas/${id}/estado`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ estado: newStatus })
+        body: JSON.stringify({ estado: newStatus, motivo_anulacion: motivoAnulacion })
       });
 
       if (!res.ok) {
         const errorData = await res.json();
-        alert(errorData.error || 'Error al cambiar estado');
+        showToast(errorData.error || 'Error al cambiar estado', 'error');
         return;
       }
 
+      showToast(`Entrega actualizada a ${newStatus} con éxito.`, 'success');
       cargarEntregas();
     } catch (error) {
       console.error('Error al cambiar estado:', error);
+      showToast('Ocurrió un error inesperado al intentar cambiar el estado.', 'error');
     }
+  };
+
+  const handleConfirmCancel = async () => {
+    if (!cancelReason.trim()) {
+      setCancelError('El motivo de anulación es obligatorio.');
+      return;
+    }
+    await procederCambioEstado(cancellingDeliveryId, 'Anulado', cancelReason);
+    setIsCancelModalOpen(false);
+    setCancellingDeliveryId(null);
+    setCancelReason('');
   };
 
   const handleSearch = (e) => {
@@ -170,6 +208,42 @@ export const Entregas = () => {
 
       {/* Modal solo de vista para detalle */}
       <DeliveryModal isOpen={isModalOpen} onClose={handleCloseModal} mode="view" deliveryData={selectedDelivery} onSave={() => {}} />
+
+      {/* MODAL DE CONFIRMACIÓN DE ANULACIÓN CON JUSTIFICACIÓN */}
+      {isCancelModalOpen && (
+        <div className="modal-overlay" style={{ zIndex: 1100 }}>
+          <div className="modal-container modal-small">
+            <div className="modal-header">
+              <h2>Justificar Anulación de Entrega</h2>
+              <button className="btn-close" onClick={() => setIsCancelModalOpen(false)}><X size={20} /></button>
+            </div>
+            <div className="modal-body">
+              <div className="input-group">
+                <label style={{ display: 'block', marginBottom: '8px', color: '#ffffff', fontWeight: 'bold' }}>Motivo de la Anulación *</label>
+                <textarea
+                  value={cancelReason}
+                  onChange={(e) => { setCancelReason(e.target.value); setCancelError(''); }}
+                  placeholder="Escribe el por qué se anula esta entrega..."
+                  rows="4"
+                  className="textarea-field"
+                  style={{ width: '100%', padding: '10px', backgroundColor: '#18181b', border: '1px solid #3f3f46', color: '#ffffff', borderRadius: '6px', boxSizing: 'border-box', resize: 'vertical' }}
+                />
+                {cancelError && <span className="error-text" style={{ color: '#ef4444', fontSize: '13px', marginTop: '6px', display: 'block' }}>{cancelError}</span>}
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button className="btn-secondary" onClick={() => setIsCancelModalOpen(false)}>Cancelar</button>
+              <button className="btn-danger" onClick={handleConfirmCancel}>
+                Confirmar Anulación
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* TOAST NOTIFICATION */}
+      <div className={`toast-notification ${toast.type} ${toast.message ? 'toast-visible' : ''}`}>
+        {toast.message}
+      </div>
     </div>
   );
 };

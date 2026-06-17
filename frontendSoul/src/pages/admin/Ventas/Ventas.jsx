@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { TrendingUp, Plus, Eye, Search, ChevronLeft, ChevronRight, FileText } from 'lucide-react';
+import { TrendingUp, Plus, Eye, Search, ChevronLeft, ChevronRight, FileText, X } from 'lucide-react';
 import { SaleModal } from './components/SaleModal';
 import { formatCOP } from '../../../utils/currency';
 import { generateRecordPDF } from '../../../utils/pdfGenerator';
@@ -12,6 +12,12 @@ export const Ventas = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('create');
   const [selectedSale, setSelectedSale] = useState(null);
+
+  // Estados para justificación de anulación
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [cancellingSaleId, setCancellingSaleId] = useState(null);
+  const [cancelReason, setCancelReason] = useState('');
+  const [cancelError, setCancelError] = useState('');
 
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -66,15 +72,32 @@ export const Ventas = () => {
     }
   };
 
-  const handleAnular = async (saleId) => {
-    if (!confirm('¿Estás seguro de anular esta venta? Se restaurará el stock.')) return;
+  const handleAnular = (saleId) => {
+    setCancellingSaleId(saleId);
+    setCancelReason('');
+    setCancelError('');
+    setIsCancelModalOpen(true);
+  };
+
+  const handleConfirmCancel = async () => {
+    if (!cancelReason.trim()) {
+      setCancelError('El motivo de anulación es obligatorio.');
+      return;
+    }
     try {
-      const res = await fetch(`${API}/ventas/${saleId}/anular`, { method: 'PATCH' });
+      const res = await fetch(`${API}/ventas/${cancellingSaleId}/anular`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ motivo_anulacion: cancelReason })
+      });
       if (!res.ok) {
         const errorData = await res.json();
         alert(errorData.error || 'Error al anular venta');
         return;
       }
+      setIsCancelModalOpen(false);
+      setCancellingSaleId(null);
+      setCancelReason('');
       cargarVentas();
     } catch (error) {
       console.error('Error al anular:', error);
@@ -82,7 +105,22 @@ export const Ventas = () => {
   };
 
   const handleOpenCreate = () => { setModalMode('create'); setSelectedSale(null); setIsModalOpen(true); };
-  const handleOpenView = (sale) => { setModalMode('view'); setSelectedSale(sale); setIsModalOpen(true); };
+  const handleOpenView = async (sale) => {
+    setModalMode('view');
+    try {
+      const res = await fetch(`${API}/ventas/${sale.id}`);
+      if (res.ok) {
+        const fullSale = await res.json();
+        setSelectedSale(fullSale);
+      } else {
+        setSelectedSale(sale);
+      }
+    } catch (err) {
+      console.error('Error al cargar detalle de venta:', err);
+      setSelectedSale(sale);
+    }
+    setIsModalOpen(true);
+  };
   const handleCloseModal = () => { setIsModalOpen(false); setSelectedSale(null); };
 
   const handleSearch = (e) => { setSearchTerm(e.target.value); setCurrentPage(1); };
@@ -260,6 +298,38 @@ export const Ventas = () => {
       )}
 
       <SaleModal isOpen={isModalOpen} onClose={handleCloseModal} mode={modalMode} saleData={selectedSale} onSave={handleSaveSale} />
+
+      {/* MODAL DE CONFIRMACIÓN DE ANULACIÓN CON JUSTIFICACIÓN */}
+      {isCancelModalOpen && (
+        <div className="modal-overlay" style={{ zIndex: 1100 }}>
+          <div className="modal-container modal-small">
+            <div className="modal-header">
+              <h2>Justificar Anulación de Venta</h2>
+              <button className="btn-close" onClick={() => setIsCancelModalOpen(false)}><X size={20} /></button>
+            </div>
+            <div className="modal-body">
+              <div className="input-group">
+                <label style={{ display: 'block', marginBottom: '8px', color: '#ffffff', fontWeight: 'bold' }}>Motivo de la Anulación *</label>
+                <textarea
+                  value={cancelReason}
+                  onChange={(e) => { setCancelReason(e.target.value); setCancelError(''); }}
+                  placeholder="Escribe el por qué se anula esta venta..."
+                  rows="4"
+                  className="textarea-field"
+                  style={{ width: '100%', padding: '10px', backgroundColor: '#18181b', border: '1px solid #3f3f46', color: '#ffffff', borderRadius: '6px', boxSizing: 'border-box', resize: 'vertical' }}
+                />
+                {cancelError && <span className="error-text" style={{ color: '#ef4444', fontSize: '13px', marginTop: '6px', display: 'block' }}>{cancelError}</span>}
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button className="btn-secondary" onClick={() => setIsCancelModalOpen(false)}>Cancelar</button>
+              <button className="btn-danger" onClick={handleConfirmCancel}>
+                Confirmar Anulación
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

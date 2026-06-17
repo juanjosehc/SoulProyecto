@@ -165,3 +165,40 @@
 .btn-page:hover:not(:disabled) { background-color: #27272a; border-color: #C9A24D; color: #C9A24D; }
 .btn-page:disabled { opacity: 0.4; cursor: not-allowed; }
 .page-indicator { color: #a1a1aa; font-size: 14px; font-weight: 500; }
+
+/* --- TOAST NOTIFICATION --- */
+.toast-notification {
+  position: fixed;
+  top: 90px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  background-color: rgba(39, 39, 42, 0.95);
+  backdrop-filter: blur(8px);
+  color: #ffffff;
+  padding: 12px 24px;
+  border-radius: 30px;
+  border: 1px solid rgba(201, 162, 77, 0.3);
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 2000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+}
+
+.toast-notification.success {
+  border-color: rgba(34, 197, 94, 0.5);
+  background-color: rgba(10, 37, 20, 0.95);
+}
+
+.toast-notification.error {
+  border-color: rgba(239, 68, 68, 0.5);
+  background-color: rgba(37, 10, 10, 0.95);
+}
+
+.toast-visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}

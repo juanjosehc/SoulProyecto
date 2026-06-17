@@ -50,6 +50,15 @@ export const SupplierModal = ({ isOpen, onClose, mode, supplierData, onSave }) =
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    if (name === 'phone') {
+      const cleanVal = value.replace(/[^0-9]/g, '');
+      if (value !== cleanVal) {
+        return;
+      }
+      if (cleanVal.length > 10) {
+        return;
+      }
+    }
     setFormData(prev => ({ ...prev, [name]: value }));
     
     // Limpiamos el error de este campo al escribir
@@ -65,7 +74,20 @@ export const SupplierModal = ({ isOpen, onClose, mode, supplierData, onSave }) =
     if (!formData.name.trim()) newErrors.name = true;
     if (!formData.document.trim()) newErrors.document = true;
     if (!formData.contactName.trim()) newErrors.contactName = true;
-    if (!formData.phone.trim()) newErrors.phone = true;
+    
+    // Correo: Validar que el texto incluya obligatoriamente el carácter @
+    if (!formData.email.trim()) {
+      newErrors.email = true;
+    } else if (!formData.email.includes('@')) {
+      newErrors.email = true;
+    }
+
+    // Teléfono: Restringir a exactamente 10 dígitos
+    if (!formData.phone.trim()) {
+      newErrors.phone = true;
+    } else if (formData.phone.trim().length !== 10) {
+      newErrors.phone = true;
+    }
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -154,17 +176,27 @@ export const SupplierModal = ({ isOpen, onClose, mode, supplierData, onSave }) =
                 value={formData.phone} 
                 onChange={handleChange} 
                 disabled={isViewOnly} 
-                placeholder="Ej: 6015551234" 
+                placeholder="Ej: 3001234567" 
                 className={errors.phone ? 'input-error' : ''}
+                maxLength={10}
               />
-              {errors.phone && <span className="error-text">El teléfono es obligatorio.</span>}
+              {errors.phone && <span className="error-text">El teléfono es obligatorio y debe tener 10 dígitos.</span>}
             </div>
           </div>
 
           <div className="form-grid-2">
             <div className="input-group">
-              <label>Correo Electrónico <span style={{ fontSize: '11px', marginLeft: '5px', color: '#71717a' }}>(Opcional)</span></label>
-              <input type="email" name="email" value={formData.email} onChange={handleChange} disabled={isViewOnly} placeholder="ejemplo@proveedor.com" />
+              <label>Correo Electrónico {!isViewOnly && <span className="required-asterisk">*</span>}</label>
+              <input 
+                type="email" 
+                name="email" 
+                value={formData.email} 
+                onChange={handleChange} 
+                disabled={isViewOnly} 
+                placeholder="ejemplo@proveedor.com" 
+                className={errors.email ? 'input-error' : ''}
+              />
+              {errors.email && <span className="error-text">El correo es obligatorio y debe incluir "@".</span>}
             </div>
             <div className="input-group">
               <label>Ciudad <span style={{ fontSize: '11px', marginLeft: '5px', color: '#71717a' }}>(Opcional)</span></label>

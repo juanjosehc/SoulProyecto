@@ -12,7 +12,8 @@ export const SaleModal = ({ isOpen, onClose, mode, saleData, onSave }) => {
   const [formData, setFormData] = useState({
     clientName: '', clientType: 'Natural',
     saleDate: new Date().toISOString().split('T')[0], 
-    paymentMethod: metodosPago[0], observations: '', discount: 0 
+    paymentMethod: metodosPago[0], observations: '', discount: 0,
+    status: 'Completado', motivoAnulacion: ''
   });
 
   const [cart, setCart] = useState([]);
@@ -32,7 +33,9 @@ export const SaleModal = ({ isOpen, onClose, mode, saleData, onSave }) => {
       setFormData({
         clientName: saleData.clientName || '', clientType: saleData.clientType || 'Natural',
         saleDate: saleData.saleDate || '', paymentMethod: saleData.paymentMethod || metodosPago[0],
-        observations: saleData.observations || '', discount: saleData.discount || 0
+        observations: saleData.observations || '', discount: saleData.discount || 0,
+        status: saleData.status || 'Completado',
+        motivoAnulacion: saleData.motivoAnulacion || ''
       });
       setCart(saleData.items || []);
       setErrors({});
@@ -177,6 +180,12 @@ export const SaleModal = ({ isOpen, onClose, mode, saleData, onSave }) => {
                   disabled 
                   style={{ backgroundColor: '#18181b', border: '1px solid #27272a', color: '#a1a1aa', padding: '10px 12px', borderRadius: '6px', width: '100%', boxSizing: 'border-box' }}
                 />
+              </div>
+            )}
+            {(formData.status === 'Anulada' || formData.status === 'Anulado') && (
+              <div className="input-group" style={{marginTop: '16px', border: '1px solid #ef4444', padding: '16px', borderRadius: '8px', backgroundColor: 'rgba(239, 68, 68, 0.08)'}}>
+                <label style={{color: '#ef4444', fontWeight: 'bold', fontSize: '14px', display: 'block', marginBottom: '8px'}}>Motivo de Anulación</label>
+                <p style={{color: '#ffffff', margin: 0, fontSize: '14px', lineHeight: '1.5', fontWeight: '500'}}>{formData.motivoAnulacion || 'No especificado'}</p>
               </div>
             )}
           </div>

@@ -123,7 +123,14 @@ export const OrderModal = ({ isOpen, onClose, mode, orderData, onSave, loading }
   const handleSubmit = () => {
     const newErrors = {};
     if (!formData.clientName.trim()) newErrors.clientName = true;
-    if (!formData.phone.trim()) newErrors.phone = true;
+    
+    // Teléfono: Restringir a exactamente 10 dígitos
+    if (!formData.phone.trim()) {
+      newErrors.phone = true;
+    } else if (formData.phone.trim().length !== 10) {
+      newErrors.phone = true;
+    }
+
     if (!formData.deliveryDate.trim()) newErrors.deliveryDate = true;
     if (!formData.deliveryAddress.trim()) newErrors.deliveryAddress = true;
     if (cart.length === 0) newErrors.cart = true;
@@ -141,6 +148,15 @@ export const OrderModal = ({ isOpen, onClose, mode, orderData, onSave, loading }
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    if (name === 'phone') {
+      const cleanVal = value.replace(/[^0-9]/g, '');
+      if (value !== cleanVal) {
+        return;
+      }
+      if (cleanVal.length > 10) {
+        return;
+      }
+    }
     setFormData(prev => ({ ...prev, [name]: value }));
     if (errors[name]) setErrors(prev => ({ ...prev, [name]: false }));
   };
@@ -181,8 +197,17 @@ export const OrderModal = ({ isOpen, onClose, mode, orderData, onSave, loading }
               </div>
               <div className="input-group">
                 <label>Teléfono <span className="required-asterisk">*</span></label>
-                <input type="text" name="phone" value={formData.phone} onChange={handleChange} disabled={isViewOnly || loading} placeholder="Ej: 3001234567" className={errors.phone ? 'input-error' : ''} />
-                {errors.phone && <span className="error-text">El teléfono es obligatorio.</span>}
+                <input 
+                  type="text" 
+                  name="phone" 
+                  value={formData.phone} 
+                  onChange={handleChange} 
+                  disabled={isViewOnly || loading} 
+                  placeholder="Ej: 3001234567" 
+                  className={errors.phone ? 'input-error' : ''} 
+                  maxLength={10}
+                />
+                {errors.phone && <span className="error-text">El teléfono es obligatorio y debe tener 10 dígitos.</span>}
               </div>
             </div>
             <div className="form-group-stack">

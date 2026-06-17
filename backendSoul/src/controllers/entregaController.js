@@ -14,6 +14,7 @@ const obtenerEntregas = async (req, res) => {
         p.estado as status,
         p.total,
         p.observaciones as notes,
+        p.motivo_anulacion as "motivoAnulacion",
         u.nombre as "deliveryPerson",
         COALESCE(
           (SELECT json_agg(
@@ -31,7 +32,7 @@ const obtenerEntregas = async (req, res) => {
         ) as items
       FROM pedidos p
       LEFT JOIN usuarios u ON p.usuario_id = u.id
-      WHERE p.estado = 'En tránsito'
+      WHERE p.estado IN ('En tránsito', 'Completado', 'Anulado')
       ORDER BY p.id DESC
     `);
     res.json(result.rows);

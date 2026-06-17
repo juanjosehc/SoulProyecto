@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import './DeliveryModal.css';
 
 const domiciliariosDisponibles = ['María Domiciliaria', 'Carlos Repartidor', 'Pedro Logística', 'Empresa Externa'];
-const estadosEntrega = ['Pendiente', 'En camino', 'Entregado', 'Fallido'];
+const estadosEntrega = ['Pendiente', 'En tránsito', 'Completado', 'Anulado', 'En camino', 'Entregado', 'Fallido'];
 
 export const DeliveryModal = ({ isOpen, onClose, mode, deliveryData, onSave }) => {
   const [formData, setFormData] = useState({
@@ -28,13 +28,14 @@ export const DeliveryModal = ({ isOpen, onClose, mode, deliveryData, onSave }) =
         deliveryPerson: deliveryData.deliveryPerson || '',
         date: deliveryData.date || '',
         status: deliveryData.status || 'Pendiente',
-        notes: deliveryData.notes || ''
+        notes: deliveryData.notes || '',
+        motivoAnulacion: deliveryData.motivoAnulacion || ''
       });
       setErrors({});
     } else if (isOpen && mode === 'create') {
       const today = new Date().toISOString().split('T')[0];
       setFormData({ 
-        orderCode: '', clientName: '', address: '', deliveryPerson: '', date: today, status: 'Pendiente', notes: '' 
+        orderCode: '', clientName: '', address: '', deliveryPerson: '', date: today, status: 'Pendiente', notes: '', motivoAnulacion: '' 
       });
       setErrors({});
     }
@@ -171,15 +172,22 @@ export const DeliveryModal = ({ isOpen, onClose, mode, deliveryData, onSave }) =
 
               <div className="input-group half-width">
                 <label>Estado de la Entrega</label>
-                <select 
-                  name="status" 
-                  value={formData.status} 
-                  onChange={handleChange} 
-                  disabled={isViewOnly}
-                  className="custom-select"
-                >
-                  {estadosEntrega.map(est => <option key={est} value={est}>{est}</option>)}
-                </select>
+                {isViewOnly ? (
+                  <input 
+                    type="text" 
+                    value={formData.status} 
+                    disabled 
+                  />
+                ) : (
+                  <select 
+                    name="status" 
+                    value={formData.status} 
+                    onChange={handleChange} 
+                    className="custom-select"
+                  >
+                    {estadosEntrega.map(est => <option key={est} value={est}>{est}</option>)}
+                  </select>
+                )}
               </div>
             </div>
 
@@ -195,6 +203,13 @@ export const DeliveryModal = ({ isOpen, onClose, mode, deliveryData, onSave }) =
                 className="textarea-field"
               />
             </div>
+
+            {formData.status === 'Anulado' && (
+              <div className="input-group full-width" style={{marginTop: '16px', border: '1px solid #ef4444', padding: '12px', borderRadius: '6px', backgroundColor: 'rgba(239, 68, 68, 0.05)'}}>
+                <label style={{color: '#ef4444', fontWeight: 'bold', fontSize: '13px', display: 'block', marginBottom: '6px'}}>Motivo de Anulación</label>
+                <p style={{color: '#f4f4f5', margin: 0, fontSize: '14px', lineHeight: '1.4'}}>{formData.motivoAnulacion || 'No especificado'}</p>
+              </div>
+            )}
 
           </div>
         </div>

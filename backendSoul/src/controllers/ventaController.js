@@ -12,6 +12,7 @@ const obtenerVentas = async (req, res) => {
         v.total,
         v.estado as status,
         v.origen as origin,
+        v.motivo_anulacion as "motivoAnulacion",
         u.nombre as "domiciliarioName",
         COALESCE(
           (SELECT json_agg(
@@ -115,6 +116,7 @@ const anularVenta = async (req, res) => {
   const cliente = await pool.connect();
   try {
     const { id } = req.params;
+    const { motivo_anulacion } = req.body;
 
     await cliente.query('BEGIN');
 
@@ -134,11 +136,11 @@ const anularVenta = async (req, res) => {
       `, [item.cantidad, item.producto_id, item.talla_vendida]);
     }
 
-    // Marcar como anulada
-    await cliente.query('UPDATE ventas SET estado = $1 WHERE id = $2', ['Anulada', id]);
+    // Marcar como anulada y guardar motivo
+    await cliente.query('UPDATE ventas SET estado = $1, motivo_anulacion = $2 WHERE id = $3', ['Anulada', motivo_anulacion || '', id]);
 
     await cliente.query('COMMIT');
-    res.json({ message: 'Venta anulada y stock restaurado' });
+    res.json({ message: 'Venta anulada and stock restaurado' });
   } catch (error) {
     await cliente.query('ROLLBACK');
     res.status(500).json({ error: error.message });
@@ -147,4 +149,51 @@ const anularVenta = async (req, res) => {
   }
 };
 
-module.exports = { obtenerVentas, crearVenta, anularVenta };
+// 4. Obtener detalle de una venta por ID
+const obtenerVentaPorId = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await pool.query(`
+      SELECT 
+        v.id,
+        v.codigo_venta as code,
+        COALESCE(c.nombres || ' ' || COALESCE(c.apellidos, ''), v.codigo_venta) as "clientName",
+        TO_CHAR(v.fecha_venta, 'YYYY-MM-DD') as "saleDate",
+        v.total,
+        v.estado as status,
+        v.origen as origin,
+        v.motivo_anulacion as "motivoAnulacion",
+        u.nombre as "domiciliarioName",
+        COALESCE(
+          (SELECT json_agg(
+            json_build_object(
+              'product', prod.nombre,
+              'talla', dv.talla_vendida,
+              'cantidad', dv.cantidad,
+              'valorUnitario', dv.precio_unitario,
+              'total', dv.subtotal
+            )
+          ) FROM detalle_ventas dv
+            JOIN productos prod ON dv.producto_id = prod.id
+            WHERE dv.venta_id = v.id
+          ), '[]'::json
+        ) as items,
+        (SELECT COALESCE(SUM(dv2.cantidad), 0) FROM detalle_ventas dv2 WHERE dv2.venta_id = v.id) as "itemsCount"
+      FROM ventas v
+      LEFT JOIN clientes c ON v.cliente_id = c.id
+      LEFT JOIN pedidos p ON v.pedido_id = p.id
+      LEFT JOIN usuarios u ON p.usuario_id = u.id
+      WHERE v.id = $1
+    `, [id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Venta no encontrada' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+module.exports = { obtenerVentas, crearVenta, anularVenta, obtenerVentaPorId };

@@ -33,6 +33,15 @@ export const ClientModal = ({ isOpen, onClose, mode, clientData, onSave }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    if (name === 'telefono') {
+      const cleanVal = value.replace(/[^0-9]/g, '');
+      if (value !== cleanVal) {
+        return;
+      }
+      if (cleanVal.length > 10) {
+        return;
+      }
+    }
     setFormData(prev => ({ ...prev, [name]: value }));
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: false }));
@@ -42,7 +51,20 @@ export const ClientModal = ({ isOpen, onClose, mode, clientData, onSave }) => {
   const handleSubmit = () => {
     const newErrors = {};
     if (!formData.nombres.trim()) newErrors.nombres = true;
-    if (!formData.telefono.trim()) newErrors.telefono = true;
+    
+    // Correo: Validar que el texto incluya obligatoriamente el carácter @
+    if (!formData.correo.trim()) {
+      newErrors.correo = true;
+    } else if (!formData.correo.includes('@')) {
+      newErrors.correo = true;
+    }
+
+    // Teléfono: Restringir a exactamente 10 dígitos
+    if (!formData.telefono.trim()) {
+      newErrors.telefono = true;
+    } else if (formData.telefono.trim().length !== 10) {
+      newErrors.telefono = true;
+    }
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -89,19 +111,21 @@ export const ClientModal = ({ isOpen, onClose, mode, clientData, onSave }) => {
             
             <div className="form-row">
               <div className="input-group" style={{ flex: 1 }}>
-                <label>Correo Electrónico</label>
+                <label>Correo Electrónico {!isViewOnly && <span className="required-asterisk">*</span>}</label>
                 <input 
                   type="email" name="correo" value={formData.correo} onChange={handleChange}
-                  disabled={isViewOnly} placeholder="Ej: juan@email.com"
+                  disabled={isViewOnly} placeholder="Ej: juan@email.com" className={errors.correo ? 'input-error' : ''}
                 />
+                {errors.correo && <span className="error-text">El correo es obligatorio y debe incluir "@".</span>}
               </div>
               <div className="input-group" style={{ flex: 1 }}>
                 <label>Teléfono {!isViewOnly && <span className="required-asterisk">*</span>}</label>
                 <input 
                   type="text" name="telefono" value={formData.telefono} onChange={handleChange}
                   disabled={isViewOnly} placeholder="Ej: 3001234567" className={errors.telefono ? 'input-error' : ''}
+                  maxLength={10}
                 />
-                {errors.telefono && <span className="error-text">El teléfono es obligatorio.</span>}
+                {errors.telefono && <span className="error-text">El teléfono es obligatorio y debe tener 10 dígitos.</span>}
               </div>
             </div>
 
