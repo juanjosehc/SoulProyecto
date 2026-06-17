@@ -100,6 +100,37 @@ export const Catalogo = () => {
     }
   };
 
+  const cargarCarritoYFusionar = async (token, tempCart) => {
+    try {
+      const res = await fetch(`${API}/carrito`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const dbCart = await res.json();
+        if (Array.isArray(dbCart)) {
+          const mergedCart = [...dbCart];
+          for (const tempItem of tempCart) {
+            const index = mergedCart.findIndex(dbItem => dbItem.id === tempItem.id && dbItem.size === tempItem.size);
+            if (index >= 0) {
+              const newQty = mergedCart[index].quantity + tempItem.quantity;
+              const maxStock = mergedCart[index].maxStock || tempItem.maxStock || newQty;
+              mergedCart[index].quantity = Math.min(newQty, maxStock);
+            } else {
+              mergedCart.push(tempItem);
+            }
+          }
+          setCart(mergedCart);
+          await sincronizarCarrito(mergedCart, token);
+          localStorage.removeItem('cart');
+        }
+      }
+    } catch (error) {
+      console.error('Error al cargar y fusionar el carrito:', error);
+    } finally {
+      hasLoadedCartFromDB.current = true;
+    }
+  };
+
   // Cargar usuario y su carrito de BD si está autenticado
   useEffect(() => {
     const userStr = localStorage.getItem('user');
@@ -109,7 +140,20 @@ export const Catalogo = () => {
         const parsedUser = JSON.parse(userStr);
         setUser(parsedUser);
         if (parsedUser.tipo === 'cliente') {
-          cargarCarrito(token);
+          const tempCartStr = localStorage.getItem('cart');
+          let tempCart = [];
+          if (tempCartStr) {
+            try {
+              tempCart = JSON.parse(tempCartStr);
+            } catch (e) {
+              console.error(e);
+            }
+          }
+          if (tempCart.length > 0) {
+            cargarCarritoYFusionar(token, tempCart);
+          } else {
+            cargarCarrito(token);
+          }
         } else {
           hasLoadedCartFromDB.current = true;
         }
@@ -118,6 +162,14 @@ export const Catalogo = () => {
         hasLoadedCartFromDB.current = true;
       }
     } else {
+      const tempCartStr = localStorage.getItem('cart');
+      if (tempCartStr) {
+        try {
+          setCart(JSON.parse(tempCartStr));
+        } catch (e) {
+          console.error(e);
+        }
+      }
       hasLoadedCartFromDB.current = true;
     }
   }, []);
@@ -127,6 +179,8 @@ export const Catalogo = () => {
     const token = localStorage.getItem('token');
     if (user && user.tipo === 'cliente' && token && hasLoadedCartFromDB.current) {
       sincronizarCarrito(cart, token);
+    } else if (!user) {
+      localStorage.setItem('cart', JSON.stringify(cart));
     }
   }, [cart, user]);
 
@@ -156,7 +210,9 @@ export const Catalogo = () => {
   const productosFiltrados = productos.filter(p => {
     const matchSearch = !searchTerm || (p.name || '').toLowerCase().includes(searchTerm.toLowerCase());
     const matchCategoria = !filtroCategoria || p.category === filtroCategoria;
-    const matchGenero = !filtroGenero || p.gender === filtroGenero;
+    const matchGenero = !filtroGenero || 
+      p.gender === filtroGenero || 
+      (p.gender === 'Unisex' && (filtroGenero === 'Hombre' || filtroGenero === 'Mujer'));
     const matchPrecioMin = !filtroPrecioMin || Number(p.price || 0) >= Number(filtroPrecioMin);
     const matchPrecioMax = !filtroPrecioMax || Number(p.price || 0) <= Number(filtroPrecioMax);
     return matchSearch && matchCategoria && matchGenero && matchPrecioMin && matchPrecioMax;
@@ -286,7 +342,8 @@ export const Catalogo = () => {
   // Checkout
   const handleCheckout = () => {
     if (!user) {
-      showToast('Debes iniciar sesión para realizar un pedido');
+      showToast('Debes iniciar sesión para realizar la compra');
+      navigate('/login', { state: { message: 'Debes iniciar sesión para realizar la compra.' } });
       return;
     }
     setCheckoutPhoneError('');
@@ -351,6 +408,7 @@ export const Catalogo = () => {
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('cart');
     setUser(null);
     setCart([]); // Limpiar carrito local
     hasLoadedCartFromDB.current = false;
@@ -644,10 +702,10 @@ export const Catalogo = () => {
                   value={checkoutForm.phone} 
                   onChange={(e) => {
                     const val = e.target.value;
-                    const cleanVal = val.replace(/[^0-9]/g, '').slice(0, 10);
+                    const cleanVal = val.replace(/[^0-9]/g, '');
                     if (val !== cleanVal && !/^[0-9]*$/.test(val)) {
-                      setCheckoutPhoneError('Solo se permiten números (máximo 10 dígitos)');
-                    } else if (val.length > 10) {
+                      setCheckoutPhoneError('Solo se permiten números');
+                    } else if (cleanVal.length > 10) {
                       setCheckoutPhoneError('El teléfono debe tener máximo 10 dígitos');
                     } else {
                       setCheckoutPhoneError('');

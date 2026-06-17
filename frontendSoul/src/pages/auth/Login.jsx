@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { ShoppingBag, ArrowLeft } from 'lucide-react';
 import './Login.css';
 
@@ -25,6 +25,13 @@ export const Login = () => {
   const [forgotError, setForgotError] = useState('');
 
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.state?.message) {
+      setError(location.state.message);
+    }
+  }, [location.state]);
 
   // === LOGIN ===
   const handleSubmit = async (e) => {
@@ -77,6 +84,16 @@ export const Login = () => {
 
     if (!regData.nombres.trim() || !regData.correo.trim() || !regData.password) {
       setRegError('Nombre, correo y contraseña son obligatorios');
+      return;
+    }
+
+    if (phoneError) {
+      setRegError(phoneError);
+      return;
+    }
+
+    if (regData.telefono && regData.telefono.length > 10) {
+      setRegError('El teléfono debe tener máximo 10 dígitos');
       return;
     }
 
@@ -187,15 +204,18 @@ export const Login = () => {
                 <input 
                   type="text" 
                   value={regData.telefono} 
+                  maxLength={10}
                   onChange={(e) => {
                     const val = e.target.value;
                     const cleanVal = val.replace(/[^0-9]/g, '');
                     if (val !== cleanVal) {
                       setPhoneError('Solo se permiten números');
+                    } else if (cleanVal.length > 10) {
+                      setPhoneError('El teléfono debe tener máximo 10 dígitos');
                     } else {
                       setPhoneError('');
                     }
-                    setRegData({...regData, telefono: cleanVal});
+                    setRegData({...regData, telefono: cleanVal.slice(0, 10)});
                   }} 
                   placeholder="3001234567" 
                 />

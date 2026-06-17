@@ -24,7 +24,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         {/* RUTA POR DEFECTO */}
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/" element={<Catalogo />} />
         
         {/* RUTAS PÚBLICAS */}
         <Route path="/login" element={<Login />} />
@@ -47,7 +47,7 @@ function App() {
         </Route>
 
         {/* RUTA COMODÍN */}
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );

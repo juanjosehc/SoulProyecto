@@ -99,7 +99,7 @@ export const Entregas = () => {
         <table className="deliveries-table">
           <thead>
             <tr>
-              <th>Guía</th>
+              <th>Domiciliario</th>
               <th>Pedido</th>
               <th>Cliente</th>
               <th>Dirección</th>
@@ -112,7 +112,9 @@ export const Entregas = () => {
             {currentDeliveries.length > 0 ? (
               currentDeliveries.map((delivery) => (
                 <tr key={delivery.id}>
-                  <td className="tracking-code">{delivery.trackingCode || `ENT-${delivery.id}`}</td>
+                  <td className="delivery-person" style={{ fontWeight: '500', color: '#ffffff' }}>
+                    {delivery.deliveryPerson || 'Sin asignar'}
+                  </td>
                   <td className="order-ref">{delivery.orderCode || `PED-${delivery.orderId}`}</td>
                   <td style={{ fontWeight: '500', color: '#e4e4e7' }}>{delivery.clientName}</td>
                   <td style={{ color: '#a1a1aa', fontSize: '13px' }}>{delivery.address || delivery.deliveryAddress}</td>

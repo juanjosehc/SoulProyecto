@@ -295,7 +295,7 @@ class _PedidoDetailScreenState extends State<PedidoDetailScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             const Text(
-                              'Fecha de Creación:',
+                              'Fecha de Entrega:',
                               style: TextStyle(fontSize: 13, color: Color(0xFF71717A)),
                             ),
                             Text(
