@@ -22,6 +22,12 @@ export const OrderModal = ({ isOpen, onClose, mode, orderData, onSave, loading }
   const [tallasDisponibles, setTallasDisponibles] = useState([]); // [{talla, stock}]
   const [stockActual, setStockActual] = useState(0);
   const [stockError, setStockError] = useState('');
+  const [toast, setToast] = useState({ message: '', type: '' });
+
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => setToast({ message: '', type: '' }), 3000);
+  };
   
   const [errors, setErrors] = useState({});
 
@@ -95,23 +101,56 @@ export const OrderModal = ({ isOpen, onClose, mode, orderData, onSave, loading }
     if (!currentValor || currentValor <= 0) newErrors.currentValor = true;
     if (!currentTalla) newErrors.currentTalla = true;
 
-    // Stock validation
-    if (currentTalla && Number(currentCantidad) > stockActual) {
-      setStockError(`Stock insuficiente. Disponible: ${stockActual}`);
-      return;
-    }
-
     if (Object.keys(newErrors).length > 0) {
       setErrors(prev => ({ ...prev, ...newErrors }));
       return;
     }
 
-    const newItem = {
-      product: currentProduct, talla: currentTalla, cantidad: Number(currentCantidad),
-      valorUnitario: Number(currentValor), total: Number(currentCantidad) * Number(currentValor)
-    };
-    
-    setCart([...cart, newItem]);
+    const qtyToAdd = Number(currentCantidad);
+    const unitPrice = Number(currentValor);
+
+    // Grouping: Check if the product & size combo is already in cart
+    const existingIndex = cart.findIndex(
+      item => item.product === currentProduct && item.talla === currentTalla
+    );
+
+    let totalQty = qtyToAdd;
+    if (existingIndex !== -1) {
+      totalQty += cart[existingIndex].cantidad;
+    }
+
+    // Stock validation (Total Stock)
+    if (currentTalla && totalQty > stockActual) {
+      const errorMsg = "No puedes agregar más unidades, supera el stock disponible.";
+      setStockError(errorMsg);
+      showToast(errorMsg, 'error');
+      return;
+    }
+
+    if (existingIndex !== -1) {
+      // Update existing row quantity and total
+      const updatedCart = [...cart];
+      updatedCart[existingIndex] = {
+        ...updatedCart[existingIndex],
+        cantidad: totalQty,
+        valorUnitario: unitPrice, // in case user input updated unit price
+        total: totalQty * unitPrice
+      };
+      setCart(updatedCart);
+      showToast("Cantidad del producto actualizada", 'success');
+    } else {
+      // Add new row
+      const newItem = {
+        product: currentProduct,
+        talla: currentTalla,
+        cantidad: qtyToAdd,
+        valorUnitario: unitPrice,
+        total: qtyToAdd * unitPrice
+      };
+      setCart([...cart, newItem]);
+      showToast("Producto agregado a la lista", 'success');
+    }
+
     setCurrentCantidad(1); 
     setStockError('');
     if (errors.cart) setErrors(prev => ({ ...prev, cart: false }));
@@ -163,6 +202,9 @@ export const OrderModal = ({ isOpen, onClose, mode, orderData, onSave, loading }
 
   return (
     <div className="modal-overlay">
+      <div className={`toast-notification ${toast.type} ${toast.message ? 'toast-visible' : ''}`}>
+        {toast.message}
+      </div>
       <div className="modal-container modal-large-order">
         <div className="modal-header">
           <h2>{title}</h2>
