@@ -24,7 +24,7 @@ export const RolesPermisos = () => {
   // ==========================================
   const cargarRoles = async () => {
     try {
-      const respuesta = await fetch('${API_URL}/roles');
+      const respuesta = await fetch(`${API_URL}/roles`);
       const datos = await respuesta.json();
       if (Array.isArray(datos)) {
         setRoles(datos);
@@ -42,7 +42,7 @@ export const RolesPermisos = () => {
     setLoading(true);
     try {
       const url = modalMode === 'create' 
-        ? '${API_URL}/roles' 
+        ? `${API_URL}/roles` 
         : `${API_URL}/roles/${roleDataFromModal.id}`;
       const method = modalMode === 'create' ? 'POST' : 'PUT';
 

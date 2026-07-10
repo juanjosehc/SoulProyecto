@@ -22,7 +22,7 @@ export const Proveedores = () => {
   // ==========================================
   const cargarProveedores = async () => {
     try {
-      const respuesta = await fetch('${API_URL}/proveedores');
+      const respuesta = await fetch(`${API_URL}/proveedores`);
       const datos = await respuesta.json();
       if (Array.isArray(datos)) {
         setSuppliers(datos);
@@ -39,7 +39,7 @@ export const Proveedores = () => {
   const handleSaveSupplier = async (supplierDataFromModal) => {
     try {
       const url = modalMode === 'create' 
-        ? '${API_URL}/proveedores' 
+        ? `${API_URL}/proveedores` 
         : `${API_URL}/proveedores/${supplierDataFromModal.id}`;
       const method = modalMode === 'create' ? 'POST' : 'PUT';
 

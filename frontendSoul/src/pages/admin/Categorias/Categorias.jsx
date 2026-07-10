@@ -29,7 +29,7 @@ export const Categorias = () => {
   // 1. LEER (GET) - Cargar datos desde la base de datos
   const cargarCategorias = async () => {
     try {
-      const respuesta = await fetch('${API_URL}/categorias');
+      const respuesta = await fetch(`${API_URL}/categorias`);
       const datos = await respuesta.json();
       
       if (Array.isArray(datos)) {
@@ -63,7 +63,7 @@ export const Categorias = () => {
 
       let respuesta;
       if (modalMode === 'create') {
-        respuesta = await fetch('${API_URL}/categorias', {
+        respuesta = await fetch(`${API_URL}/categorias`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(datosParaBackend)

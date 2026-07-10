@@ -25,7 +25,7 @@ export const Productos = () => {
   // 1. LEER (GET) - Traer productos con tallas e imágenes
   const cargarProductos = async () => {
     try {
-      const respuesta = await fetch('${API_URL}/productos');
+      const respuesta = await fetch(`${API_URL}/productos`);
       const datos = await respuesta.json();
       
       // El "Escudo": verificamos que sea un arreglo para que no de pantalla gris
@@ -51,7 +51,7 @@ export const Productos = () => {
     try {
       // El modal ya nos entrega los datos en el formato perfecto para nuestra API
       const url = modalMode === 'create' 
-        ? '${API_URL}/productos' 
+        ? `${API_URL}/productos` 
         : `${API_URL}/productos/${productDataFromModal.id}`;
         
       const method = modalMode === 'create' ? 'POST' : 'PUT';

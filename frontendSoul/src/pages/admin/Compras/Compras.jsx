@@ -21,7 +21,7 @@ export const Compras = () => {
 
   const cargarCompras = async () => {
     try {
-      const respuesta = await fetch('${API_URL}/compras');
+      const respuesta = await fetch(`${API_URL}/compras`);
       const datos = await respuesta.json();
       if (Array.isArray(datos)) {
         setPurchases(datos);
@@ -54,7 +54,7 @@ export const Compras = () => {
         }))
       };
 
-      const respuesta = await fetch('${API_URL}/compras', {
+      const respuesta = await fetch(`${API_URL}/compras`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)

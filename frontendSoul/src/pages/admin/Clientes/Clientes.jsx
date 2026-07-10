@@ -21,7 +21,7 @@ export const Clientes = () => {
   const loadClients = async () => {
     try {
       // Endpoint sugerido para obtener usuarios que tengan el rol_id correspondiente a 'Cliente'
-      const response = await fetch('${API_URL}/clientes');
+      const response = await fetch(`${API_URL}/clientes`);
       const data = await response.json();
       if (Array.isArray(data)) {
         setClients(data);
@@ -41,7 +41,7 @@ export const Clientes = () => {
       const isEditing = clientData.id != null;
       const url = isEditing 
         ? `${API_URL}/clientes/${clientData.id}` 
-        : '${API_URL}/clientes';
+        : `${API_URL}/clientes`;
       
       const method = isEditing ? 'PUT' : 'POST';
 

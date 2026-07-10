@@ -23,7 +23,7 @@ export const Usuarios = () => {
 
   const cargarUsuarios = async () => {
     try {
-      const respuesta = await fetch('${API_URL}/usuarios');
+      const respuesta = await fetch(`${API_URL}/usuarios`);
       const datos = await respuesta.json();
       
       if (Array.isArray(datos)) {
@@ -45,7 +45,7 @@ export const Usuarios = () => {
   const handleSaveUser = async (userDataFromModal) => {
     try {
       const url = modalMode === 'create' 
-        ? '${API_URL}/usuarios' 
+        ? `${API_URL}/usuarios` 
         : `${API_URL}/usuarios/${userDataFromModal.id}`;
         
       const method = modalMode === 'create' ? 'POST' : 'PUT';

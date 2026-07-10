@@ -18,7 +18,7 @@ export const UserModal = ({ isOpen, onClose, mode, userData, onSave }) => {
     // Cargar dinámicamente roles activos de la API
     const fetchRoles = async () => {
       try {
-        const respuesta = await fetch('${API_URL}/roles');
+        const respuesta = await fetch(`${API_URL}/roles`);
         const datos = await respuesta.json();
         if (Array.isArray(datos)) {
           // El controlador devuelve { name, isActive }
