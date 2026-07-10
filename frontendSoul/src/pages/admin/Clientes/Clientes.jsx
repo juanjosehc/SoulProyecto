@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Users, Plus, Edit2, Trash2, Search, ChevronLeft, ChevronRight, Eye, ShieldAlert, Power } from 'lucide-react';
 import { ClientModal } from './components/ClientModal';
+import { API_URL } from '../../../config/api';
 import './Clientes.css';
 
 export const Clientes = () => {
@@ -20,7 +21,7 @@ export const Clientes = () => {
   const loadClients = async () => {
     try {
       // Endpoint sugerido para obtener usuarios que tengan el rol_id correspondiente a 'Cliente'
-      const response = await fetch('http://localhost:3000/api/clientes');
+      const response = await fetch('${API_URL}/clientes');
       const data = await response.json();
       if (Array.isArray(data)) {
         setClients(data);
@@ -39,8 +40,8 @@ export const Clientes = () => {
     try {
       const isEditing = clientData.id != null;
       const url = isEditing 
-        ? `http://localhost:3000/api/clientes/${clientData.id}` 
-        : 'http://localhost:3000/api/clientes';
+        ? `${API_URL}/clientes/${clientData.id}` 
+        : '${API_URL}/clientes';
       
       const method = isEditing ? 'PUT' : 'POST';
 
@@ -76,7 +77,7 @@ export const Clientes = () => {
   // 3. CAMBIAR ESTADO (Activo / Inactivo)
   const handleToggleStatus = async (clientId, currentStatus) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/clientes/${clientId}/estado`, {
+      const response = await fetch(`${API_URL}/clientes/${clientId}/estado`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ estado: !currentStatus })
@@ -93,7 +94,7 @@ export const Clientes = () => {
   // 4. ELIMINAR CLIENTE
   const handleConfirmDelete = async () => {
     try {
-      await fetch(`http://localhost:3000/api/clientes/${clientToDelete.id}`, {
+      await fetch(`${API_URL}/clientes/${clientToDelete.id}`, {
         method: 'DELETE'
       });
       loadClients();

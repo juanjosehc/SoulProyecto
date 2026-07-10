@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Users, Plus, Eye, Edit, Power, Trash2, X, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { UserModal } from './components/UserModal';
+import { API_URL } from '../../../config/api';
 import './Usuarios.css';
 
 export const Usuarios = () => {
@@ -22,7 +23,7 @@ export const Usuarios = () => {
 
   const cargarUsuarios = async () => {
     try {
-      const respuesta = await fetch('http://localhost:3000/api/usuarios');
+      const respuesta = await fetch('${API_URL}/usuarios');
       const datos = await respuesta.json();
       
       if (Array.isArray(datos)) {
@@ -44,8 +45,8 @@ export const Usuarios = () => {
   const handleSaveUser = async (userDataFromModal) => {
     try {
       const url = modalMode === 'create' 
-        ? 'http://localhost:3000/api/usuarios' 
-        : `http://localhost:3000/api/usuarios/${userDataFromModal.id}`;
+        ? '${API_URL}/usuarios' 
+        : `${API_URL}/usuarios/${userDataFromModal.id}`;
         
       const method = modalMode === 'create' ? 'POST' : 'PUT';
 
@@ -73,7 +74,7 @@ export const Usuarios = () => {
     if (!user) return;
 
     try {
-      await fetch(`http://localhost:3000/api/usuarios/${id}/estado`, {
+      await fetch(`${API_URL}/usuarios/${id}/estado`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ is_active: !user.isActive })
@@ -86,7 +87,7 @@ export const Usuarios = () => {
 
   const handleConfirmDelete = async () => {
     try {
-      const respuesta = await fetch(`http://localhost:3000/api/usuarios/${userToDelete.id}`, {
+      const respuesta = await fetch(`${API_URL}/usuarios/${userToDelete.id}`, {
         method: 'DELETE'
       });
       

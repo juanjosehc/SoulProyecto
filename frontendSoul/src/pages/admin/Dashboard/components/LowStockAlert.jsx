@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { AlertTriangle } from 'lucide-react';
-
-const API = 'http://localhost:3000/api';
+import { API_URL } from '../../../../config/api';
 
 export const LowStockAlert = () => {
   const [productos, setProductos] = useState([]);
@@ -9,7 +8,7 @@ export const LowStockAlert = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch(`${API}/dashboard/low-stock`);
+        const res = await fetch(`${API_URL}/dashboard/low-stock`);
         const data = await res.json();
         setProductos(data);
       } catch (error) {

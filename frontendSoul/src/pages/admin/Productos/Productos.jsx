@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Package, Plus, Eye, Edit, Power, Trash2, X, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { ProductModal } from './components/ProductModal';
+import { API_URL } from '../../../config/api';
 import './Productos.css';
 
 export const Productos = () => {
@@ -24,7 +25,7 @@ export const Productos = () => {
   // 1. LEER (GET) - Traer productos con tallas e imágenes
   const cargarProductos = async () => {
     try {
-      const respuesta = await fetch('http://localhost:3000/api/productos');
+      const respuesta = await fetch('${API_URL}/productos');
       const datos = await respuesta.json();
       
       // El "Escudo": verificamos que sea un arreglo para que no de pantalla gris
@@ -50,8 +51,8 @@ export const Productos = () => {
     try {
       // El modal ya nos entrega los datos en el formato perfecto para nuestra API
       const url = modalMode === 'create' 
-        ? 'http://localhost:3000/api/productos' 
-        : `http://localhost:3000/api/productos/${productDataFromModal.id}`;
+        ? '${API_URL}/productos' 
+        : `${API_URL}/productos/${productDataFromModal.id}`;
         
       const method = modalMode === 'create' ? 'POST' : 'PUT';
 
@@ -74,7 +75,7 @@ export const Productos = () => {
     if (!product) return;
 
     try {
-      await fetch(`http://localhost:3000/api/productos/${id}/estado`, {
+      await fetch(`${API_URL}/productos/${id}/estado`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ is_active: !product.isActive })
@@ -89,7 +90,7 @@ export const Productos = () => {
   // 4. ELIMINAR (DELETE)
   const handleConfirmDelete = async () => {
     try {
-      const respuesta = await fetch(`http://localhost:3000/api/productos/${productToDelete.id}`, {
+      const respuesta = await fetch(`${API_URL}/productos/${productToDelete.id}`, {
         method: 'DELETE'
       });
       

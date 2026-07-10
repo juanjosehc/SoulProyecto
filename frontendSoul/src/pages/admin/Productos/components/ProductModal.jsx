@@ -1,8 +1,7 @@
 import { X, Upload, Star, Trash2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { API_URL } from '../../../../config/api';
 import './ProductModal.css';
-
-const API = 'http://localhost:3000/api';
 const tallasList = ['6', '6.5', '7', '7.5', '8', '8.5', '9', '9.5', '10', '10.5', '11'];
 const generosList = ['Unisex', 'Hombre', 'Mujer'];
 
@@ -22,7 +21,7 @@ export const ProductModal = ({ isOpen, onClose, mode, productData, onSave }) => 
     if (isOpen) {
       const fetchCategorias = async () => {
         try {
-          const res = await fetch(`${API}/categorias`);
+          const res = await fetch(`${API_URL}/categorias`);
           const data = await res.json();
           if (Array.isArray(data)) {
             setCategoriasDB(data.filter(c => c.is_active !== false));
@@ -106,7 +105,7 @@ export const ProductModal = ({ isOpen, onClose, mode, productData, onSave }) => 
         setUploadingCount(prev => prev + 1);
 
         try {
-          const res = await fetch(`${API}/productos/upload`, {
+          const res = await fetch(`${API_URL}/productos/upload`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ image: base64 })

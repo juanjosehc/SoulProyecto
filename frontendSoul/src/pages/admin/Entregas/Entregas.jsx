@@ -3,7 +3,7 @@ import { Truck, Eye, Search, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { DeliveryModal } from './components/DeliveryModal';
 import './Entregas.css';
 
-const API = 'http://localhost:3000/api';
+import { API_URL } from '../../../config/api';
 
 export const Entregas = () => {
   const [deliveries, setDeliveries] = useState([]);
@@ -30,7 +30,7 @@ export const Entregas = () => {
 
   const cargarEntregas = async () => {
     try {
-      const res = await fetch(`${API}/entregas`);
+      const res = await fetch(`${API_URL}/entregas`);
       const data = await res.json();
       if (Array.isArray(data)) setDeliveries(data);
     } catch (error) {
@@ -56,7 +56,7 @@ export const Entregas = () => {
 
   const procederCambioEstado = async (id, newStatus, motivoAnulacion = '') => {
     try {
-      const res = await fetch(`${API}/entregas/${id}/estado`, {
+      const res = await fetch(`${API_URL}/entregas/${id}/estado`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ estado: newStatus, motivo_anulacion: motivoAnulacion })

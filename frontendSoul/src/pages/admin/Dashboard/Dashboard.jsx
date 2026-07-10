@@ -7,7 +7,7 @@ import { LowStockAlert } from './components/LowStockAlert';
 import { formatCOP } from '../../../utils/currency';
 import './Dashboard.css'; 
 
-const API = 'http://localhost:3000/api';
+import { API_URL } from '../../../config/api';
 
 export const Dashboard = () => {
   const [stats, setStats] = useState({ ventasHoy: 0, ventasTotal: 0, pedidosActivos: 0, totalClientes: 0 });
@@ -15,7 +15,7 @@ export const Dashboard = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await fetch(`${API}/dashboard/stats`);
+        const res = await fetch(`${API_URL}/dashboard/stats`);
         const data = await res.json();
         setStats(data);
       } catch (error) {

@@ -5,7 +5,7 @@ import { formatCOP } from '../../../utils/currency';
 import { generateRecordPDF } from '../../../utils/pdfGenerator';
 import './Ventas.css';
 
-const API = 'http://localhost:3000/api';
+import { API_URL } from '../../../config/api';
 
 export const Ventas = () => {
   const [sales, setSales] = useState([]);
@@ -28,7 +28,7 @@ export const Ventas = () => {
 
   const cargarVentas = async () => {
     try {
-      const res = await fetch(`${API}/ventas`);
+      const res = await fetch(`${API_URL}/ventas`);
       const data = await res.json();
       if (Array.isArray(data)) setSales(data);
     } catch (error) {
@@ -41,7 +41,7 @@ export const Ventas = () => {
   useEffect(() => {
     const fetchDomiciliarios = async () => {
       try {
-        const res = await fetch(`${API}/usuarios/search/domiciliarios?q=`);
+        const res = await fetch(`${API_URL}/usuarios/search/domiciliarios?q=`);
         const data = await res.json();
         if (Array.isArray(data)) setDomiciliarios(data);
       } catch (err) {
@@ -53,7 +53,7 @@ export const Ventas = () => {
 
   const handleSaveSale = async (saleData) => {
     try {
-      const res = await fetch(`${API}/ventas`, {
+      const res = await fetch(`${API_URL}/ventas`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(saleData)
@@ -85,7 +85,7 @@ export const Ventas = () => {
       return;
     }
     try {
-      const res = await fetch(`${API}/ventas/${cancellingSaleId}/anular`, {
+      const res = await fetch(`${API_URL}/ventas/${cancellingSaleId}/anular`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ motivo_anulacion: cancelReason })
@@ -108,7 +108,7 @@ export const Ventas = () => {
   const handleOpenView = async (sale) => {
     setModalMode('view');
     try {
-      const res = await fetch(`${API}/ventas/${sale.id}`);
+      const res = await fetch(`${API_URL}/ventas/${sale.id}`);
       if (res.ok) {
         const fullSale = await res.json();
         setSelectedSale(fullSale);

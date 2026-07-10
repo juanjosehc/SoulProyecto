@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-
-const API = 'http://localhost:3000/api';
+import { API_URL } from '../../../../config/api';
 
 export const TopProductsChart = () => {
   const [data, setData] = useState([]);
@@ -9,7 +8,7 @@ export const TopProductsChart = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch(`${API}/dashboard/top-products`);
+        const res = await fetch(`${API_URL}/dashboard/top-products`);
         const chartData = await res.json();
         setData(chartData);
       } catch (error) {

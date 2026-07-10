@@ -1,5 +1,6 @@
 import { X } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { API_URL } from '../../../../config/api';
 import './UserModal.css';
 
 export const UserModal = ({ isOpen, onClose, mode, userData, onSave }) => {
@@ -17,7 +18,7 @@ export const UserModal = ({ isOpen, onClose, mode, userData, onSave }) => {
     // Cargar dinámicamente roles activos de la API
     const fetchRoles = async () => {
       try {
-        const respuesta = await fetch('http://localhost:3000/api/roles');
+        const respuesta = await fetch('${API_URL}/roles');
         const datos = await respuesta.json();
         if (Array.isArray(datos)) {
           // El controlador devuelve { name, isActive }

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { ShoppingCart, Plus, Eye, Trash2, X, Search, ChevronLeft, ChevronRight, FileText } from 'lucide-react';
 import { PurchaseModal } from './components/PurchaseModal';
 import { generateRecordPDF } from '../../../utils/pdfGenerator';
+import { API_URL } from '../../../config/api';
 import './Compras.css';
 
 export const Compras = () => {
@@ -20,7 +21,7 @@ export const Compras = () => {
 
   const cargarCompras = async () => {
     try {
-      const respuesta = await fetch('http://localhost:3000/api/compras');
+      const respuesta = await fetch('${API_URL}/compras');
       const datos = await respuesta.json();
       if (Array.isArray(datos)) {
         setPurchases(datos);
@@ -53,7 +54,7 @@ export const Compras = () => {
         }))
       };
 
-      const respuesta = await fetch('http://localhost:3000/api/compras', {
+      const respuesta = await fetch('${API_URL}/compras', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -77,7 +78,7 @@ export const Compras = () => {
   const handleConfirmDelete = async () => {
     setLoading(true);
     try {
-      const respuesta = await fetch(`http://localhost:3000/api/compras/${purchaseToDelete.id}`, { method: 'DELETE' });
+      const respuesta = await fetch(`${API_URL}/compras/${purchaseToDelete.id}`, { method: 'DELETE' });
       if (!respuesta.ok) {
         const errData = await respuesta.json();
         alert(errData.error || "No se pudo anular la compra.");

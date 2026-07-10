@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Layers, Plus, Eye, Edit, Power, Trash2, X, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { CategoryModal } from './components/CategoryModal';
+import { API_URL } from '../../../config/api';
 import './Categorias.css';
 
 export const Categorias = () => {
@@ -28,7 +29,7 @@ export const Categorias = () => {
   // 1. LEER (GET) - Cargar datos desde la base de datos
   const cargarCategorias = async () => {
     try {
-      const respuesta = await fetch('http://localhost:3000/api/categorias');
+      const respuesta = await fetch('${API_URL}/categorias');
       const datos = await respuesta.json();
       
       if (Array.isArray(datos)) {
@@ -62,13 +63,13 @@ export const Categorias = () => {
 
       let respuesta;
       if (modalMode === 'create') {
-        respuesta = await fetch('http://localhost:3000/api/categorias', {
+        respuesta = await fetch('${API_URL}/categorias', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(datosParaBackend)
         });
       } else if (modalMode === 'edit') {
-        respuesta = await fetch(`http://localhost:3000/api/categorias/${categoryDataFromModal.id}`, {
+        respuesta = await fetch(`${API_URL}/categorias/${categoryDataFromModal.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(datosParaBackend)
@@ -96,7 +97,7 @@ export const Categorias = () => {
 
     setLoading(true);
     try {
-      await fetch(`http://localhost:3000/api/categorias/${id}/estado`, {
+      await fetch(`${API_URL}/categorias/${id}/estado`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ is_active: !categoria.isActive })
@@ -114,7 +115,7 @@ export const Categorias = () => {
     setLoading(true);
     setDeleteError('');
     try {
-      const respuesta = await fetch(`http://localhost:3000/api/categorias/${categoryToDelete.id}`, {
+      const respuesta = await fetch(`${API_URL}/categorias/${categoryToDelete.id}`, {
         method: 'DELETE'
       });
       

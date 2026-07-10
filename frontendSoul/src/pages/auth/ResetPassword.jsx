@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
+import { API_URL } from '../../config/api';
 import './Login.css'; // Reutilizamos estilos del Login
-
-const API = 'http://localhost:3000/api';
 
 export const ResetPassword = () => {
   const [searchParams] = useSearchParams();
@@ -49,7 +48,7 @@ export const ResetPassword = () => {
 
     setLoading(true);
     try {
-      const res = await fetch(`${API}/auth/reset-password`, {
+      const res = await fetch(`${API_URL}/auth/reset-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, newPassword: password })

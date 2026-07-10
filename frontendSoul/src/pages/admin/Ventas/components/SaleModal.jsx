@@ -2,10 +2,9 @@ import { X, Trash2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { formatCOP } from '../../../../utils/currency';
 import { AutocompleteInput } from '../../../../utils/AutocompleteInput';
+import { API_URL } from '../../../../config/api';
 import '../../../../utils/AutocompleteInput.css';
 import './SaleModal.css';
-
-const API = 'http://localhost:3000/api';
 const metodosPago = ['Efectivo', 'Transferencia', 'Tarjeta de Crédito', 'Nequi', 'Daviplata'];
 
 export const SaleModal = ({ isOpen, onClose, mode, saleData, onSave }) => {
@@ -243,7 +242,7 @@ export const SaleModal = ({ isOpen, onClose, mode, saleData, onSave }) => {
               <div className="add-product-box">
                 <div className="input-group-small" style={{marginBottom: '12px'}}>
                   <label>Buscar Producto</label>
-                  <AutocompleteInput value={currentProduct} onChange={(val) => setCurrentProduct(val)} fetchUrl={`${API}/productos/search`} placeholder="Escribir nombre..." onSelect={handleProductSelect} />
+                  <AutocompleteInput value={currentProduct} onChange={(val) => setCurrentProduct(val)} fetchUrl={`${API_URL}/productos/search`} placeholder="Escribir nombre..." onSelect={handleProductSelect} />
                 </div>
                 
                 <div className="add-product-row">

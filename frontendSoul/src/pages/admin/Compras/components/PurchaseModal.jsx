@@ -1,10 +1,9 @@
 import { X, Trash2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { AutocompleteInput } from '../../../../utils/AutocompleteInput';
+import { API_URL } from '../../../../config/api';
 import '../../../../utils/AutocompleteInput.css';
 import './PurchaseModal.css';
-
-const API = 'http://localhost:3000/api';
 const metodosPago = ['Transferencia', 'Efectivo', 'Tarjeta de Crédito'];
 const tallasList = ['6', '6.5', '7', '7.5', '8', '8.5', '9', '9.5', '10', '10.5', '11'];
 
@@ -132,7 +131,7 @@ export const PurchaseModal = ({ isOpen, onClose, mode, purchaseData, onSave, loa
                 <AutocompleteInput
                   value={formData.provider}
                   onChange={(val) => { setFormData({...formData, provider: val}); if(errors.provider) setErrors({...errors, provider: false}); }}
-                  fetchUrl={`${API}/proveedores/search`}
+                  fetchUrl={`${API_URL}/proveedores/search`}
                   placeholder="Buscar proveedor..."
                   className={errors.provider ? 'input-error' : ''}
                   disabled={loading}
@@ -161,7 +160,7 @@ export const PurchaseModal = ({ isOpen, onClose, mode, purchaseData, onSave, loa
                 <AutocompleteInput
                   value={currentProduct}
                   onChange={(val) => setCurrentProduct(val)}
-                  fetchUrl={`${API}/productos/search`}
+                  fetchUrl={`${API_URL}/productos/search`}
                   placeholder="Escribir nombre del producto..."
                   onSelect={(item) => {
                     setCurrentProduct(item.name);

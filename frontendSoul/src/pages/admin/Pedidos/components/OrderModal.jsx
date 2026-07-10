@@ -2,10 +2,9 @@ import { X, Trash2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { formatCOP } from '../../../../utils/currency';
 import { AutocompleteInput } from '../../../../utils/AutocompleteInput';
+import { API_URL } from '../../../../config/api';
 import '../../../../utils/AutocompleteInput.css';
 import './OrderModal.css';
-
-const API = 'http://localhost:3000/api';
 
 export const OrderModal = ({ isOpen, onClose, mode, orderData, onSave, loading }) => {
   const [formData, setFormData] = useState({
@@ -227,7 +226,7 @@ export const OrderModal = ({ isOpen, onClose, mode, orderData, onSave, loading }
                       setFormData(prev => ({ ...prev, clientName: val, clienteId: null }));
                       if (errors.clientName) setErrors(prev => ({ ...prev, clientName: false }));
                     }}
-                    fetchUrl={`${API}/clientes/search`}
+                    fetchUrl={`${API_URL}/clientes/search`}
                     placeholder="Buscar cliente..."
                     displayKey="nombres"
                     onSelect={handleClienteSelect}
@@ -274,7 +273,7 @@ export const OrderModal = ({ isOpen, onClose, mode, orderData, onSave, loading }
                   onChange={(val) => {
                     setFormData(prev => ({ ...prev, domiciliarioName: val, usuarioId: null }));
                   }}
-                  fetchUrl={`${API}/usuarios/search/domiciliarios`}
+                  fetchUrl={`${API_URL}/usuarios/search/domiciliarios`}
                   placeholder="Buscar domiciliario..."
                   displayKey="name"
                   onSelect={handleDomiciliarioSelect}
@@ -305,7 +304,7 @@ export const OrderModal = ({ isOpen, onClose, mode, orderData, onSave, loading }
               <div className="add-product-box">
                 <div className="input-group-small" style={{marginBottom: '12px'}}>
                   <label>Buscar Producto</label>
-                  <AutocompleteInput value={currentProduct} onChange={(val) => setCurrentProduct(val)} fetchUrl={`${API}/productos/search`} placeholder="Escribir nombre..." onSelect={handleProductSelect} disabled={loading} />
+                  <AutocompleteInput value={currentProduct} onChange={(val) => setCurrentProduct(val)} fetchUrl={`${API_URL}/productos/search`} placeholder="Escribir nombre..." onSelect={handleProductSelect} disabled={loading} />
                 </div>
                 
                 <div className="add-product-row">

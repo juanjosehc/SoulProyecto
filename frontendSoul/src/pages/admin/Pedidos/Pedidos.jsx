@@ -5,7 +5,7 @@ import { formatCOP } from '../../../utils/currency';
 import { generateRecordPDF } from '../../../utils/pdfGenerator';
 import './Pedidos.css';
 
-const API = 'http://localhost:3000/api';
+import { API_URL } from '../../../config/api';
 
 export const Pedidos = () => {
   const [orders, setOrders] = useState([]);
@@ -34,7 +34,7 @@ export const Pedidos = () => {
   const cargarPedidos = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`${API}/pedidos`, {
+      const res = await fetch(`${API_URL}/pedidos`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
@@ -50,7 +50,7 @@ export const Pedidos = () => {
     setLoading(true);
     try {
       const isEditing = orderData.id != null;
-      const url = isEditing ? `${API}/pedidos/${orderData.id}` : `${API}/pedidos`;
+      const url = isEditing ? `${API_URL}/pedidos/${orderData.id}` : `${API_URL}/pedidos`;
       const method = isEditing ? 'PUT' : 'POST';
       const token = localStorage.getItem('token');
 
@@ -93,7 +93,7 @@ export const Pedidos = () => {
       if (domiciliarios.length === 0) {
         try {
           const token = localStorage.getItem('token');
-          const res = await fetch(`${API}/usuarios/search/domiciliarios?q=`, {
+          const res = await fetch(`${API_URL}/usuarios/search/domiciliarios?q=`, {
             headers: { 'Authorization': `Bearer ${token}` }
           });
           if (res.ok) {
@@ -116,7 +116,7 @@ export const Pedidos = () => {
       const token = localStorage.getItem('token');
       const body = { estado: newStatus, motivo_anulacion: motivoAnulacion };
       if (usuarioId != null) body.usuarioId = usuarioId;
-      const res = await fetch(`${API}/pedidos/${orderId}/estado`, {
+      const res = await fetch(`${API_URL}/pedidos/${orderId}/estado`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify(body)

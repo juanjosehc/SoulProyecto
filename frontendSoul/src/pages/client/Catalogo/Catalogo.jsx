@@ -1,9 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { ShoppingBag, X, Plus, Minus, Trash2, ArrowLeft, ChevronDown, CheckCircle2, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { API_URL } from '../../../config/api';
 import './Catalogo.css';
-
-const API = 'http://localhost:3000/api';
 
 const formatCOP = (value) => {
   const num = Number(value);
@@ -71,7 +70,7 @@ export const Catalogo = () => {
   // Métodos auxiliares para sincronización del carrito
   const cargarCarrito = async (token) => {
     try {
-      const res = await fetch(`${API}/carrito`, {
+      const res = await fetch(`${API_URL}/carrito`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -87,7 +86,7 @@ export const Catalogo = () => {
 
   const sincronizarCarrito = async (items, token) => {
     try {
-      await fetch(`${API}/carrito`, {
+      await fetch(`${API_URL}/carrito`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -102,7 +101,7 @@ export const Catalogo = () => {
 
   const cargarCarritoYFusionar = async (token, tempCart) => {
     try {
-      const res = await fetch(`${API}/carrito`, {
+      const res = await fetch(`${API_URL}/carrito`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -190,8 +189,8 @@ export const Catalogo = () => {
       setIsLoading(true);
       try {
         const [resProd, resCat] = await Promise.all([
-          fetch(`${API}/productos/active`),
-          fetch(`${API}/categorias`)
+          fetch(`${API_URL}/productos/active`),
+          fetch(`${API_URL}/categorias`)
         ]);
         const dataProd = await resProd.json();
         const dataCat = await resCat.json();
@@ -380,7 +379,7 @@ export const Catalogo = () => {
         itemsCount: cart.length
       };
 
-      const res = await fetch(`${API}/pedidos`, {
+      const res = await fetch(`${API_URL}/pedidos`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -419,7 +418,7 @@ export const Catalogo = () => {
     if (!token) return;
     setIsLoadingHistory(true);
     try {
-      const res = await fetch(`${API}/pedidos/mi-historial`, {
+      const res = await fetch(`${API_URL}/pedidos/mi-historial`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {

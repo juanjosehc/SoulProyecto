@@ -1,9 +1,8 @@
 import { X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { getAuthHeaders } from '../../../../utils/auth';
+import { API_URL } from '../../../../config/api';
 import './RoleModal.css';
-
-const API = 'http://localhost:3000/api';
 
 export const RoleModal = ({ isOpen, onClose, mode, roleData, onSave, loading }) => {
   const [nombreRol, setNombreRol] = useState('');
@@ -15,7 +14,7 @@ export const RoleModal = ({ isOpen, onClose, mode, roleData, onSave, loading }) 
   useEffect(() => {
     if (isOpen) {
       // Cargar catálogo de permisos
-      fetch(`${API}/permisos`, { headers: getAuthHeaders() })
+      fetch(`${API_URL}/permisos`, { headers: getAuthHeaders() })
         .then(res => res.json())
         .then(data => {
             if (Array.isArray(data)) setModulosDisponibles(data);

@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ShoppingBag, ArrowLeft } from 'lucide-react';
+import { API_URL } from '../../config/api';
 import './Login.css';
-
-const API = 'http://localhost:3000/api';
 
 export const Login = () => {
   const [email, setEmail] = useState('');
@@ -46,7 +45,7 @@ export const Login = () => {
     setError('');
 
     try {
-      const res = await fetch(`${API}/auth/login`, {
+      const res = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
@@ -109,7 +108,7 @@ export const Login = () => {
 
     setLoading(true);
     try {
-      const res = await fetch(`${API}/auth/register`, {
+      const res = await fetch(`${API_URL}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(regData)
@@ -146,7 +145,7 @@ export const Login = () => {
 
     setLoading(true);
     try {
-      const res = await fetch(`${API}/auth/forgot-password`, {
+      const res = await fetch(`${API_URL}/auth/forgot-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: forgotEmail })

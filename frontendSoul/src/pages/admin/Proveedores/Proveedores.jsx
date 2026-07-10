@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Truck, Plus, Eye, Edit, Power, Trash2, X, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { SupplierModal } from './components/SupplierModal';
+import { API_URL } from '../../../config/api';
 import './Proveedores.css';
 
 export const Proveedores = () => {
@@ -21,7 +22,7 @@ export const Proveedores = () => {
   // ==========================================
   const cargarProveedores = async () => {
     try {
-      const respuesta = await fetch('http://localhost:3000/api/proveedores');
+      const respuesta = await fetch('${API_URL}/proveedores');
       const datos = await respuesta.json();
       if (Array.isArray(datos)) {
         setSuppliers(datos);
@@ -38,8 +39,8 @@ export const Proveedores = () => {
   const handleSaveSupplier = async (supplierDataFromModal) => {
     try {
       const url = modalMode === 'create' 
-        ? 'http://localhost:3000/api/proveedores' 
-        : `http://localhost:3000/api/proveedores/${supplierDataFromModal.id}`;
+        ? '${API_URL}/proveedores' 
+        : `${API_URL}/proveedores/${supplierDataFromModal.id}`;
       const method = modalMode === 'create' ? 'POST' : 'PUT';
 
       const respuesta = await fetch(url, {
@@ -66,7 +67,7 @@ export const Proveedores = () => {
     if (!supplier) return;
 
     try {
-      await fetch(`http://localhost:3000/api/proveedores/${id}/estado`, {
+      await fetch(`${API_URL}/proveedores/${id}/estado`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ is_active: !supplier.isActive })
@@ -79,7 +80,7 @@ export const Proveedores = () => {
 
   const handleConfirmDelete = async () => {
     try {
-      const respuesta = await fetch(`http://localhost:3000/api/proveedores/${supplierToDelete.id}`, {
+      const respuesta = await fetch(`${API_URL}/proveedores/${supplierToDelete.id}`, {
         method: 'DELETE'
       });
       

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Shield, Plus, Eye, Edit, Power, Trash2, X, Search, ChevronLeft, ChevronRight } from 'lucide-react'; 
 import { RoleModal } from './components/RoleModal';
+import { API_URL } from '../../../config/api';
 import './RolesPermisos.css';
 
 export const RolesPermisos = () => {
@@ -23,7 +24,7 @@ export const RolesPermisos = () => {
   // ==========================================
   const cargarRoles = async () => {
     try {
-      const respuesta = await fetch('http://localhost:3000/api/roles');
+      const respuesta = await fetch('${API_URL}/roles');
       const datos = await respuesta.json();
       if (Array.isArray(datos)) {
         setRoles(datos);
@@ -41,8 +42,8 @@ export const RolesPermisos = () => {
     setLoading(true);
     try {
       const url = modalMode === 'create' 
-        ? 'http://localhost:3000/api/roles' 
-        : `http://localhost:3000/api/roles/${roleDataFromModal.id}`;
+        ? '${API_URL}/roles' 
+        : `${API_URL}/roles/${roleDataFromModal.id}`;
       const method = modalMode === 'create' ? 'POST' : 'PUT';
 
       const respuesta = await fetch(url, {
@@ -79,7 +80,7 @@ export const RolesPermisos = () => {
 
     setLoading(true);
     try {
-      await fetch(`http://localhost:3000/api/roles/${id}/estado`, {
+      await fetch(`${API_URL}/roles/${id}/estado`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ is_active: !role.isActive })
@@ -96,7 +97,7 @@ export const RolesPermisos = () => {
     setLoading(true);
     setDeleteError('');
     try {
-      const respuesta = await fetch(`http://localhost:3000/api/roles/${roleToDelete.id}`, {
+      const respuesta = await fetch(`${API_URL}/roles/${roleToDelete.id}`, {
         method: 'DELETE'
       });
       
